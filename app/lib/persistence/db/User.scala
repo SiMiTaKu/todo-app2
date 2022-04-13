@@ -11,6 +11,7 @@ import ixias.persistence.model.Table
 
 import lib.model.User
 
+
 // UserTable: Userテーブルへのマッピングを行う
 //~~~~~~~~~~~~~~
 case class UserTable[P <: JdbcProfile]()(implicit val driver: P)
