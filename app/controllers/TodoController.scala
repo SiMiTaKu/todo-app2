@@ -10,7 +10,7 @@ import model.ViewValueHome
 class TodoController @Inject()(val controllerComponents: ControllerComponents) extends BaseController {
 
   def list() = Action { implicit req =>
-    val a = lib.persistence.onMySQL.UserRepository.get()
+
     val vv = ViewValueHome(
       title = "TodoList",
       cssSrc = Seq("main.css"),

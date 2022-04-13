@@ -4,7 +4,6 @@ package controllers
 import javax.inject._
 import play.api.mvc._
 import model.ViewValueHome
-import lib.
 
 @Singleton
 class CategoryController @Inject()(val controllerComponents: ControllerComponents) extends BaseController {
