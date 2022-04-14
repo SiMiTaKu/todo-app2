@@ -1,5 +1,14 @@
 
-@(vv: model.ViewValueCommon)
+@import lib.model.Todo
+@(todo:Todo#EmbeddedId, vv: model.ViewValueCommon)
 @common.Default(vv){
+    <ul class = "card">
+      <li class = "card__content">@todo.v.id</li>
+      <li class = "card__content">@todo.v.category_id</li>
+      <li class = "card__content">@todo.v.title</li>
+      <li class = "card__content">@todo.v.state</li>
+      <li class = "card__content">@todo.v.createdAt</li>
+      <li class = "card__content">@todo.v.updatedAt</li>
+    </ul>
 
 }

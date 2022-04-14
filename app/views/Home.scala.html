@@ -3,13 +3,10 @@
  * to do sample project
  *
  *@
-@import lib.model.User
-
-@(user:User#EmbeddedId, vv: model.ViewValueCommon)
+@(vv: model.ViewValueCommon)
 @common.Default(vv){
  <ul>
     <li><a href = "/category/list">カテゴリー一覧</a></li>
     <li><a href = "/todo/list">Todo一覧</a></li>
-    <p>@user.v.id</p>
  </ul>
 }

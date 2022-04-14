@@ -17,4 +17,9 @@ trait SlickResourceProvider[P <: JdbcProfile] {
   lazy val AllTables = Seq(
     UserTable
   )
+
+  object TodoTable extends TodoTable
+  lazy val allTables = Seq(
+    TodoTable
+  )
 }

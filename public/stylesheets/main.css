@@ -43,3 +43,11 @@ body {
 .info {
   display: none;
 }
+
+.card__content{
+  width: 15%;
+  padding: 5px;
+  text-align: center;
+  display: inline-block;
+  text-decoration: none;
+}
