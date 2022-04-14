@@ -35,3 +35,15 @@ INSERT INTO `to_do`(category_id,title,body,state) values(2, 'Controllerの修正
 INSERT INTO `to_do`(category_id,title,body,state) values(3, '新しいDB環境の作成','タイトル通り',2);
 
 
+CREATE TABLE user (
+    id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL,
+    age INT(8) unsigned NOT NULL,
+    state INT(8)  unsigned NOT NULL,
+    updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO user(name, age, state) values("Takumi", 24, 3);
+INSERT INTO user(name, age, state) values("Kanta", 22, 2);
