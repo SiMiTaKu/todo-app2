@@ -44,10 +44,54 @@ body {
   display: none;
 }
 
+.card{
+  border: solid 2px #d4edff;
+  margin-bottom: 3px
+}
+
 .card__content{
+  margin: 5px;
+}
+
+.card__content--body{
+  width: 31%;
+  padding: 5px;
+  text-align: center;
+  display: inline-block;
+  text-decoration: none;
+  border-left: solid 1px #5d5d5d;
+}
+.card__content--id{
+  width: 3%;
+  padding: 5px;
+  text-align: center;
+  display: inline-block;
+  text-decoration: none;
+  border-left: solid 1px #5d5d5d;
+}
+.card__content--category{
   width: 15%;
   padding: 5px;
   text-align: center;
   display: inline-block;
   text-decoration: none;
+  border-left: solid 1px #5d5d5d;
 }
+.card__content--title{
+  width: 22%;
+  padding: 5px;
+  text-align: center;
+  display: inline-block;
+  text-decoration: none;
+  border-left: solid 1px #5d5d5d;
+}
+.card__content--state{
+  width: 10%;
+  padding: 5px;
+  text-align: center;
+  display: inline-block;
+  text-decoration: none;
+  border-left: solid 1px #5d5d5d;
+  border-right: solid 1px #5d5d5d;
+}
+

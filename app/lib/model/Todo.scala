@@ -23,13 +23,13 @@ object Todo {
   type WithNoId = Entity.WithNoId [Id, Todo]
   type EmbeddedId = Entity.EmbeddedId[Id, Todo]
 
-  def apply( category_id: Option[Int], title: String, body: String, state: Option[Int]): WithNoId = {
+  def apply(category_id: Option[Int], title: String, body: String, state: Option[Int]): WithNoId = {
     new Entity.WithNoId(
       new Todo(
         id = None,
         category_id = category_id,
-        body = body,
         title = title,
+        body = body,
         state = state,
       )
     )

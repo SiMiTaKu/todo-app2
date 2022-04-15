@@ -12,3 +12,7 @@ GET     /assets/*file               controllers.Assets.versioned(path="/public",
 GET     /category/list              controllers.CategoryController.list
 
 GET     /todo/list                  controllers.TodoController.list
+
+GET     /todo/registerForm          controllers.TodoController.register
+
+POST    /todo/registerForm          controllers.TodoController.add

@@ -1,0 +1,13 @@
+@import controllers.TodoFormData
+@(form: Form[TodoFormData], vv: model.ViewValueCommon)(implicit messageProvider: MessagesProvider, requestHeader: RequestHeader)
+
+@common.Default(vv) {
+    @helper.form(action = controllers.routes.TodoController.add) {
+        @helper.CSRF.formField
+        @helper.inputText(form("category"))
+        @helper.inputText(form("title"))
+        @helper.inputText(form("body"))
+        <input type="submit" value="register">
+    }
+    <a href = "/todo/list">Back to todo list</a>
+}
