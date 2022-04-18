@@ -1,6 +1,9 @@
 package lib.model
 
 import ixias.model._
+import ixias.util.EnumStatus
+import lib.model.Todo.Status
+
 import java.time.LocalDateTime
 
 // ユーザーを表すモデル
@@ -12,7 +15,7 @@ case class Todo(
                  category_id:      Option[Int],
                  title:            String,
                  body:             String,
-                 state:            Option[Int],
+                 state:            Status,
                  updatedAt: LocalDateTime = NOW,
                  createdAt: LocalDateTime = NOW
                ) extends EntityModel[Id]
@@ -23,7 +26,14 @@ object Todo {
   type WithNoId = Entity.WithNoId [Id, Todo]
   type EmbeddedId = Entity.EmbeddedId[Id, Todo]
 
-  def apply(category_id: Option[Int], title: String, body: String, state: Option[Int]): WithNoId = {
+  sealed abstract class Status(val code: Short, val name: String) extends EnumStatus
+  object Status extends EnumStatus.Of[Status] {
+    case object TODO extends Status(code = 0, name = "TODO")
+    case object RUN  extends Status(code = 1, name = "RUN")
+    case object DONE extends Status(code = 2, name = "DONE")
+  }
+
+  def apply(category_id: Option[Int], title: String, body: String, state: Status): WithNoId = {
     new Entity.WithNoId(
       new Todo(
         id = None,

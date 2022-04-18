@@ -3,6 +3,7 @@
 # https://www.playframework.com/documentation/latest/ScalaRouting
 # ~~~~
 
+
 # An example controller showing a sample home page
 GET     /                           controllers.HomeController.index
 
@@ -16,3 +17,5 @@ GET     /todo/list                  controllers.TodoController.list
 GET     /todo/registerForm          controllers.TodoController.register
 
 POST    /todo/registerForm          controllers.TodoController.add
+
+GET     /todo/$id<[0-9]+>           controllers.TodoController.detail(id: Long)

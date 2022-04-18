@@ -45,5 +45,5 @@ CREATE TABLE user (
     PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO user(name, age, state) values("Takumi", 24, 3);
-INSERT INTO user(name, age, state) values("Kanta", 22, 2);
+INSERT INTO user(name, age, state) values("Takumi", 24, 0);
+INSERT INTO user(name, age, state) values("Kanta", 22, 100);

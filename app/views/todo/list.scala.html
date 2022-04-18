@@ -1,28 +1,37 @@
 
 @import lib.model.Todo
-@(todos: Seq[Todo#EmbeddedId], vv: model.ViewValueCommon)
+@(todos: Seq[Todo#EmbeddedId], vv: model.ViewValueCommon)(implicit messageProvider: MessagesProvider, requestHeader: RequestHeader)
 @common.Default(vv){
-    <div class="card">
-        <ul class = "card__content">
-            <li class = "card__content--id">ID</li>
-            <li class = "card__content--title">TITLE</li>
-            <li class = "card__content--body">BODY</li>
-            <li class = "card__content--category">CATEGORY</li>
-            <li class = "card__content--state">STATUS</li>
-        </ul>
+    <div class = "card">
+        <div class = "card__content">
+            <div class = "card__content--id">ID</div>
+            <div class = "card__content--title">TITLE</div>
+            <div class = "card__content--body">BODY</div>
+            <div class = "card__content--category">CATEGORY</div>
+            <div class = "card__content--state">STATUS</div>
+        </div>
     </div>
-
     @for(todo <- todos) {
-        <div class="card">
-            <ul class = "card__content">
-                <li class = "card__content--id">@todo.v.id</li>
-                <li class = "card__content--title">@todo.v.title</li>
-                <li class = "card__content--body">@todo.v.body</li>
-                <li class = "card__content--category">@todo.v.category_id</li>
-                <li class = "card__content--state">
-                    @if(todo.v.state == Some(0)){TODO}else if(todo.v.state == Some(1)){RUN} else {DONE}
-                </li>
-            </ul>
+        <div class = "card" data-href = "@controllers.routes.TodoController.detail(todo.v.id.getOrElse(0))">
+            <div class = "card__content">
+                <div class = "card__content--id">@todo.v.id</div>
+                <div class = "card__content--title">@todo.v.title</div>
+                <div class = "card__content--body">@todo.v.body</div>
+                <div class = "card__content--category">@todo.v.category_id</div>
+                <div class = "card__content--state">@todo.v.state.name</div>
+
+                <div class = "card__footer">
+                    <div class = "card__footer--item">
+                        <a href = "@controllers.routes.TodoController.detail(todo.v.id.getOrElse(0))">Detail</a>
+                    </div>
+                    <li class = "card__footer--item">
+                        <a>Edit</a>
+                    </li>
+                    <li class = "card__footer--item">
+                        <a>Remove</a>
+                    </li>
+                </div>
+            </div>
         </div>
     }
 

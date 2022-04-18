@@ -45,8 +45,10 @@ body {
 }
 
 .card{
-  border: solid 2px #d4edff;
-  margin-bottom: 3px
+  width: 100%;
+  text-align: left;
+  cursor:  pointer;
+  border-bottom: solid 3px #caffff;
 }
 
 .card__content{
@@ -56,42 +58,54 @@ body {
 .card__content--body{
   width: 31%;
   padding: 5px;
-  text-align: center;
   display: inline-block;
-  text-decoration: none;
+  text-align: center;
   border-left: solid 1px #5d5d5d;
 }
 .card__content--id{
-  width: 3%;
+  width: 10px;
   padding: 5px;
-  text-align: center;
   display: inline-block;
-  text-decoration: none;
+  text-align: center;
   border-left: solid 1px #5d5d5d;
 }
 .card__content--category{
-  width: 15%;
+  width: 10%;
   padding: 5px;
-  text-align: center;
   display: inline-block;
-  text-decoration: none;
+  text-align: center;
   border-left: solid 1px #5d5d5d;
 }
 .card__content--title{
   width: 22%;
   padding: 5px;
-  text-align: center;
   display: inline-block;
-  text-decoration: none;
+  text-align: center;
   border-left: solid 1px #5d5d5d;
 }
 .card__content--state{
-  width: 10%;
+  width: 7%;
   padding: 5px;
-  text-align: center;
   display: inline-block;
-  text-decoration: none;
+  text-align: center;
   border-left: solid 1px #5d5d5d;
   border-right: solid 1px #5d5d5d;
+}
+
+.card__footer {
+  text-align: right;
+  display: inline-block;
+}
+
+.card__footer .card__footer--item {
+  display:     inline-block;
+  margin-left: 5px;
+}
+
+.card_footer .card_footer_item a:link,
+.card_footer .card_footer_item i {
+  color:     Black;
+  font-size: 0.9em;
+  cursor:    pointer;
 }
 
