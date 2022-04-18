@@ -10,7 +10,6 @@ import lib.persistence.default.TodoRepository
 import play.api.data.Forms.{mapping, nonEmptyText, number}
 import play.api.data.Form
 import play.api.i18n.I18nSupport
-import lib.model.Todo.Id
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -48,7 +47,6 @@ class TodoController @Inject()(
       cssSrc = Seq("main.css"),
       jsSrc  = Seq("main.js")
     )
-
     for {
       todo <- TodoRepository.get(lib.model.Todo.Id(id))
     } yield {
@@ -99,18 +97,16 @@ class TodoController @Inject()(
       }
     )
   }
-/*
+
   def remove() = Action async {implicit request: Request[AnyContent] =>
-    val idOpt = request.body.asFormUrlEncoded.get("id").headOption
+    val id = request.body.asFormUrlEncoded.get("id").headOption.get.toLong
     for {
-      result <- TodoRepository.remove(idOpt.map(_.toInt))
+      result <- TodoRepository.remove(lib.model.Todo.Id(id))
     } yield {
       result match {
-        case 0 => NotFound(views.html.error.page404())
-        case _ => Redirect(routes.TodoController.list)
+        case Some(result) => Redirect(routes.TodoController.list)
+        case None         => NotFound(views.html.page404(error_vv))
       }
     }
   }
-
- */
 }

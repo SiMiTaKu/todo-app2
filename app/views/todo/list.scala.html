@@ -22,13 +22,21 @@
 
                 <div class = "card__footer">
                     <div class = "card__footer--item">
-                        <a href = "@controllers.routes.TodoController.detail(todo.v.id.getOrElse(0))">Detail</a>
+                        @helper.form(action = controllers.routes.TodoController.detail(todo.v.id.getOrElse(0))) {
+                            @helper.CSRF.formField
+                            <input type="hidden" value="@todo.id" name="id">
+                            <input type="submit" value="Detail">
+                        }
                     </div>
                     <li class = "card__footer--item">
                         <a>Edit</a>
                     </li>
                     <li class = "card__footer--item">
-                        <a>Remove</a>
+                    @helper.form(action = controllers.routes.TodoController.remove) {
+                        @helper.CSRF.formField
+                        <input type="hidden" value="@todo.id" name="id">
+                        <input type="submit" value="Remove">
+                    }
                     </li>
                 </div>
             </div>
