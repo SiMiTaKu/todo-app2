@@ -1,12 +1,12 @@
-
+@import lib.model.Category
 @import lib.model.Todo
-@(todo: Todo#EmbeddedId, vv: model.ViewValueCommon)(implicit messageProvider: MessagesProvider, requestHeader: RequestHeader)
+@(todo: Todo#EmbeddedId, categories: Seq[Category#EmbeddedId], vv: model.ViewValueCommon)(implicit messageProvider: MessagesProvider, requestHeader: RequestHeader)
 @common.Default(vv) {
-    <div class = "detail">
+    <div class = "detail" style ="background-color: #@categories(todo.v.category_id.get - 1).v.color">
         <div class = "detail__list">
             <div class = "detail__list--item">@todo.v.title</div>
             <div class = "detail__list--item">@todo.v.body</div>
-            <div class = "detail__list--item">@todo.v.category_id</div>
+            <div class = "detail__list--item">@categories(todo.v.category_id.get - 1).v.name</div>
             <div class = "detail__list--item">@todo.v.state</div>
         </div>
     </div>

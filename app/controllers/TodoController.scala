@@ -1,18 +1,21 @@
 package controllers
 
 import lib.model.Todo
+import lib.persistence.CategoryRepository
+
 import javax.inject._
 import play.api.mvc._
 import model.ViewValueHome
 import lib.persistence.default.TodoRepository
 import play.api.data.Forms.{mapping, nonEmptyText, number}
-import play.api.data.{Form}
+import play.api.data.Form
 import play.api.i18n.I18nSupport
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 case class TodoFormData(category: Int, title: String, body: String)
-case class TodoEditFormData(category: Int, title: String, body: String, state: String)
+case class TodoEditFormData(category: String, title: String, body: String, state: String)
 
 @Singleton
 class TodoController @Inject()(
@@ -33,8 +36,9 @@ class TodoController @Inject()(
     )
     for{
       results <- TodoRepository.getAll()
+      categories <- lib.persistence.default.CategoryRepository.getAll()
     } yield{
-      Ok(views.html.todo.list(results, vv))
+      Ok(views.html.todo.list(results, categories, vv))
     }
   }
 
@@ -46,9 +50,10 @@ class TodoController @Inject()(
     )
     for{
       todo <- TodoRepository.get(lib.model.Todo.Id(id))
+      categories <- lib.persistence.default.CategoryRepository.getAll()
     } yield {
       todo match {
-        case Some(result) => Ok(views.html.todo.detail(result, vv))
+        case Some(result) => Ok(views.html.todo.detail(result, categories, vv))
         case None         => NotFound(views.html.page404(error_vv))
       }
     }
@@ -106,7 +111,7 @@ class TodoController @Inject()(
 
   val editForm = Form(
     mapping(
-      "category" -> number,
+      "category" -> nonEmptyText,
 
       "title"    -> nonEmptyText(maxLength = 140),
       "body"     -> nonEmptyText(maxLength = 200),
@@ -122,17 +127,19 @@ class TodoController @Inject()(
     )
     for{
       todo <- TodoRepository.get(lib.model.Todo.Id(id))
+      categories <- lib.persistence.default.CategoryRepository.getAll()
     } yield {
       todo match {
         case Some(result) =>
           Ok(views.html.todo.edit(
             id,
             editForm.fill(TodoEditFormData(
-              result.v.category_id.get,
+              result.v.category_id.get.toString,
               result.v.title,
               result.v.body,
               result.v.state.toString
             )),
+            categories,
             vv
           ))
         case None         => NotFound(views.html.page404(error_vv))
@@ -149,14 +156,18 @@ class TodoController @Inject()(
 
     editForm.bindFromRequest().fold(
       (formWithErrors: Form[TodoEditFormData]) => {
-        Future.successful(BadRequest(views.html.todo.edit(id, formWithErrors, vv)))
+        for{
+          categories <- lib.persistence.default.CategoryRepository.getAll()
+        }yield{
+          BadRequest(views.html.todo.edit(id, formWithErrors, categories, vv))
+        }
       },
     (data: TodoEditFormData) => {
 
       val todoEmbeddedID: Todo#EmbeddedId =
         new Todo(
           id = Some(lib.model.Todo.Id(id)),
-          category_id = Some(data.category),
+          category_id = Some(data.category.toInt),
           title = data.title,
           body = data.body,
           state = lib.model.Todo.Status(data.state.toShort)

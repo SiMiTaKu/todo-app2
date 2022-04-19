@@ -1,10 +1,15 @@
 @import controllers.TodoEditFormData
-@(id: Long, form: Form[TodoEditFormData], vv: model.ViewValueCommon)(implicit messageProvider: MessagesProvider, requestHeader: RequestHeader)
+@import lib.model.Category
+@(id: Long, form: Form[TodoEditFormData], categories: Seq[Category#EmbeddedId], vv: model.ViewValueCommon)(implicit messageProvider: MessagesProvider, requestHeader: RequestHeader)
 
 @common.Default(vv) {
     @helper.form(action = controllers.routes.TodoController.update(id)) {
         @helper.CSRF.formField
-        @helper.inputText(form("category"))
+        @helper.inputRadioGroup(
+            form("category"),
+            options = categories.map(category => (category.v.id.get.toString, category.v.name)),
+            '_help -> ""
+        )
         @helper.inputText(form("title"))
         @helper.textarea(form("body"),
             'rows -> 7, 'cols -> 100,

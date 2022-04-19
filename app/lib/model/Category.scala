@@ -8,7 +8,7 @@ case class Category(
                  id:     Option[Id],
                  name:            String,
                  slug:            String,
-                 color:           Int,
+                 color:           String,
                  updatedAt: LocalDateTime = NOW,
                  createdAt: LocalDateTime = NOW
                ) extends EntityModel[Id]
@@ -19,7 +19,7 @@ object Category {
   type WithNoId = Entity.WithNoId [Id, Category]
   type EmbeddedId = Entity.EmbeddedId[Id, Category]
 
-  def apply(name: String, slug: String, color: Int): WithNoId = {
+  def apply(name: String, slug: String, color: String): WithNoId = {
     new Entity.WithNoId(
       new Category(
         id    = None,

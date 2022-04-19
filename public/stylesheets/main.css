@@ -48,11 +48,14 @@ body {
   width: 100%;
   text-align: left;
   cursor:  pointer;
-  border-bottom: solid 3px #caffff;
+  font-size: 13px;
+  background-color: #c7c6c6;
+  padding: 3px;
+  margin-bottom: 6px;
 }
 
 .card__content{
-  margin: 5px;
+  background-color: #e1e1e1;
 }
 
 .card__content--body{
@@ -117,3 +120,5 @@ body {
   border-left: solid 1px #5d5d5d;
   border-right: solid 1px #5d5d5d;
 }
+
+

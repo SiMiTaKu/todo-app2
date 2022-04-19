@@ -1,6 +1,7 @@
 
 @import lib.model.Todo
-@(todos: Seq[Todo#EmbeddedId], vv: model.ViewValueCommon)(implicit messageProvider: MessagesProvider, requestHeader: RequestHeader)
+@import lib.model.Category
+@(todos: Seq[Todo#EmbeddedId], categories: Seq[Category#EmbeddedId], vv: model.ViewValueCommon)(implicit messageProvider: MessagesProvider, requestHeader: RequestHeader)
 @common.Default(vv){
     <div class = "card">
         <div class = "card__content">
@@ -12,12 +13,14 @@
         </div>
     </div>
     @for(todo <- todos) {
-        <div class = "card" data-href = "@controllers.routes.TodoController.detail(todo.v.id.getOrElse(0))">
-            <div class = "card__content">
+        <div class = "card">
+            <div class = "card__content" style ="background-color: #@categories(todo.v.category_id.get - 1).v.color">
                 <div class = "card__content--id">@todo.v.id</div>
                 <div class = "card__content--title">@todo.v.title</div>
                 <div class = "card__content--body">@todo.v.body</div>
-                <div class = "card__content--category">@todo.v.category_id</div>
+                <div class = "card__content--category">
+                    @categories(todo.v.category_id.get - 1).v.name
+                </div>
                 <div class = "card__content--state">@todo.v.state.name</div>
 
                 <div class = "card__footer">
