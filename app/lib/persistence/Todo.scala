@@ -40,7 +40,6 @@ case class TodoRepository[P <: JdbcProfile]()(implicit val driver: P)
       } yield old
     }
 
-
   def remove(id: Id): Future[Option[EntityEmbeddedId]] =
     RunDBAction(TodoTable) { slick =>
       val row = slick.filter(_.id === id)

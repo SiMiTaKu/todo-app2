@@ -28,16 +28,20 @@
                             <input type="submit" value="Detail">
                         }
                     </div>
-                    <li class = "card__footer--item">
-                        <a>Edit</a>
-                    </li>
-                    <li class = "card__footer--item">
-                    @helper.form(action = controllers.routes.TodoController.remove) {
-                        @helper.CSRF.formField
-                        <input type="hidden" value="@todo.id" name="id">
-                        <input type="submit" value="Remove">
-                    }
-                    </li>
+                    <div class = "card__footer--item">
+                        @helper.form(action = controllers.routes.TodoController.edit(todo.v.id.getOrElse(0))){
+                            @helper.CSRF.formField
+                            <input type="hidden" value="@todo.id" name="id">
+                            <input type="submit" value="Edit">
+                        }
+                    </div>
+                    <div class = "card__footer--item">
+                        @helper.form(action = controllers.routes.TodoController.remove) {
+                            @helper.CSRF.formField
+                            <input type="hidden" value="@todo.id" name="id">
+                            <input type="submit" value="Remove">
+                        }
+                    </div>
                 </div>
             </div>
         </div>

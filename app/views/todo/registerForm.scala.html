@@ -5,9 +5,13 @@
     @helper.form(action = controllers.routes.TodoController.add) {
         @helper.CSRF.formField
         @helper.inputText(form("category"))
-        @helper.inputText(form("title"))
-        @helper.inputText(form("body"))
-        <input type="submit" value="register">
+        @helper.inputText(form("title"),'cols -> 100)
+        @helper.textarea(form("body"),
+            'rows -> 7, 'cols -> 100,
+        '_label -> "body", '_showConstraints -> false)
+        <input type="submit" value="Register">
     }
-    <a href = "/todo/list">Back to todo list</a>
+    <h2>
+        <a href = "/todo/list">Back to todo list</a>
+    </h2>
 }

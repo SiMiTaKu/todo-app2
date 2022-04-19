@@ -33,14 +33,14 @@ object Todo {
     case object DONE extends Status(code = 2, name = "DONE")
   }
 
-  def apply(category_id: Option[Int], title: String, body: String, state: Status): WithNoId = {
+  def apply(category_id: Option[Int], title: String, body: String): WithNoId = {
     new Entity.WithNoId(
       new Todo(
         id = None,
         category_id = category_id,
         title = title,
         body = body,
-        state = state,
+        state = Status(0),
       )
     )
   }

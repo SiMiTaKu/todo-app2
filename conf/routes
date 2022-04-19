@@ -21,3 +21,7 @@ POST    /todo/registerForm          controllers.TodoController.add
 GET     /todo/$id<[0-9]+>           controllers.TodoController.detail(id: Long)
 
 POST    /todo/remove                controllers.TodoController.remove
+
+GET     /todo/$id<[0-9]+>/edit      controllers.TodoController.edit(id: Long)
+
+POST    /todo/$id<[0-9]+>/update    controllers.TodoController.update(id: Long)

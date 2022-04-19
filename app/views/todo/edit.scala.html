@@ -1,0 +1,22 @@
+@import controllers.TodoEditFormData
+@(id: Long, form: Form[TodoEditFormData], vv: model.ViewValueCommon)(implicit messageProvider: MessagesProvider, requestHeader: RequestHeader)
+
+@common.Default(vv) {
+    @helper.form(action = controllers.routes.TodoController.update(id)) {
+        @helper.CSRF.formField
+        @helper.inputText(form("category"))
+        @helper.inputText(form("title"))
+        @helper.textarea(form("body"),
+            'rows -> 7, 'cols -> 100,
+            '_label -> "body", '_showConstraints -> false)
+        @helper.inputRadioGroup(
+            form("state"),
+            options = helper.options(("0", "TODO"), ("1", "RUN"), ("2", "DONE")),
+            '_help -> ""
+        )
+        <input type="submit" value="Update">
+    }
+    <h2>
+        <a href = "/todo/list">Back to todo list</a>
+    </h2>
+}
