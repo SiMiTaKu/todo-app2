@@ -1,18 +1,13 @@
 package controllers
 
-import ixias.model.NOW
 import lib.model.Todo
-
-
 import javax.inject._
 import play.api.mvc._
 import model.ViewValueHome
 import lib.persistence.default.TodoRepository
 import play.api.data.Forms.{mapping, nonEmptyText, number}
-import play.api.data.Form
+import play.api.data.{Form}
 import play.api.i18n.I18nSupport
-
-import java.time.LocalDateTime
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -45,7 +40,7 @@ class TodoController @Inject()(
 
   def detail(id: Long) = Action async { implicit request: Request[AnyContent] =>
     val vv = ViewValueHome(
-      title  = "Detail",
+      title  = s"Detail  Todo No.${id}",
       cssSrc = Seq("main.css"),
       jsSrc  = Seq("main.js")
     )
@@ -112,6 +107,7 @@ class TodoController @Inject()(
   val editForm = Form(
     mapping(
       "category" -> number,
+
       "title"    -> nonEmptyText(maxLength = 140),
       "body"     -> nonEmptyText(maxLength = 200),
       "state"    -> nonEmptyText
@@ -159,11 +155,11 @@ class TodoController @Inject()(
 
       val todoEmbeddedID: Todo#EmbeddedId =
         new Todo(
-        id = Some(lib.model.Todo.Id(id)),
-        category_id = Some(data.category),
-        title = data.title,
-        body = data.body,
-        state = lib.model.Todo.Status(data.state.toShort)
+          id = Some(lib.model.Todo.Id(id)),
+          category_id = Some(data.category),
+          title = data.title,
+          body = data.body,
+          state = lib.model.Todo.Status(data.state.toShort)
         ).toEmbeddedId
 
         for {

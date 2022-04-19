@@ -1,5 +1,22 @@
-@(vv: model.ViewValueCommon)
+@import lib.model.Category
+@(categories: Seq[Category#EmbeddedId], vv: model.ViewValueCommon)
 @common.Default(vv){
+    <div class = "card">
+        <div class = "card__content">
+            <div class = "card__content--item">Name</div>
+            <div class = "card__content--item">Slug</div>
+            <div class = "card__content--item">Color</div>
+        </div>
+    </div>
+    @for(category <- categories){
+        <div class = "card">
+            <div class = "card__content">
+                <div class = "card__content--item">@category.v.name</div>
+                <div class = "card__content--item">@category.v.slug</div>
+                <div class = "card__content--item">@category.v.color</div>
+            </div>
+        </div>
+    }
     <h2>
         <a href = "/">Back To Home</a>
     </h2>

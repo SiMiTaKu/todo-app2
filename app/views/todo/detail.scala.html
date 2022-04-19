@@ -3,13 +3,12 @@
 @(todo: Todo#EmbeddedId, vv: model.ViewValueCommon)(implicit messageProvider: MessagesProvider, requestHeader: RequestHeader)
 @common.Default(vv) {
     <div class = "detail">
-        <ul class = "detail__list">
-            <li class = "detail__list--item">@todo.v.id</li>
-            <li class = "detail__list--item">@todo.v.title</li>
-            <li class = "detail__list--item">@todo.v.body</li>
-            <li class = "detail__list--item">@todo.v.category_id</li>
-            <li class = "detail__list--item">@todo.v.state</li>
-        </ul>
+        <div class = "detail__list">
+            <div class = "detail__list--item">@todo.v.title</div>
+            <div class = "detail__list--item">@todo.v.body</div>
+            <div class = "detail__list--item">@todo.v.category_id</div>
+            <div class = "detail__list--item">@todo.v.state</div>
+        </div>
     </div>
     <h2>
         <a href = "/todo/list">Back To Todo List</a>
