@@ -16,9 +16,9 @@ class CategoryController @Inject()(
 
   def list() = Action async{ implicit req =>
     val vv = ViewValueHome(
-      title = "Category List",
+      title  = "Category List",
       cssSrc = Seq("main.css"),
-      jsSrc = Seq("main.js")
+      jsSrc  = Seq("main.js")
     )
     for{
       results <- CategoryRepository.getAll()

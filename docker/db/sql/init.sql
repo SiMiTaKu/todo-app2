@@ -8,15 +8,15 @@ CREATE TABLE `to_do_category` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(64) NOT NULL,
   `slug` VARCHAR(64) CHARSET ascii NOT NULL,
-  `color` VARCHAR(8) NOT NULL,
+  `color` TINYINT UNSIGNED NOT NULL,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO to_do_category(name,slug,color) values('フロントエンド','front', 'ffc2c2');
-INSERT INTO to_do_category(name,slug,color) values('バックエンド','back', 'c2ffc2');
-INSERT INTO to_do_category(name,slug,color) values('インフラ','infra', 'c2c2ff');
+INSERT INTO to_do_category(name,slug,color) values('フロントエンド','front',1);
+INSERT INTO to_do_category(name,slug,color) values('バックエンド','back',2);
+INSERT INTO to_do_category(name,slug,color) values('インフラ','infra',3);
 
 
 CREATE TABLE `to_do` (

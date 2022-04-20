@@ -22,12 +22,12 @@ case class CategoryTable[P <: JdbcProfile]()(implicit val driver: P)
     def id          = column[Id]            ("id",          O.UInt64, O.PrimaryKey, O.AutoInc)
     def name        = column[String]        ("name",        O.Utf8Char255)
     def slug        = column[String]        ("slug",        O.Utf8Char255)
-    def color       = column[String]           ("color",       O.UInt8)
+    def color       = column[Int]           ("color",       O.UInt8)
     def updatedAt   = column[LocalDateTime] ("updated_at",  O.TsCurrent)
     def createdAt   = column[LocalDateTime] ("created_at",  O.Ts)
 
     type TableElementTuple = (
-      Option[Id], String, String, String, LocalDateTime, LocalDateTime
+      Option[Id], String, String, Int, LocalDateTime, LocalDateTime
       )
 
     // DB <=> Scala の相互のmapping定義

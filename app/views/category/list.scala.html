@@ -9,8 +9,9 @@
         </div>
     </div>
     @for(category <- categories){
+
         <div class = "card">
-            <div class = "card__content">
+            <div class = "card__content" style="background-color: #@Category.colorMap.get(category.v.color)">
                 <div class = "card__content--item">@category.v.name</div>
                 <div class = "card__content--item">@category.v.slug</div>
                 <div class = "card__content--item">@category.v.color</div>

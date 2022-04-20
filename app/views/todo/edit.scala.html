@@ -1,4 +1,4 @@
-@import controllers.TodoEditFormData
+@import lib.persistence.db.TodoEditFormData
 @import lib.model.Category
 @(id: Long, form: Form[TodoEditFormData], categories: Seq[Category#EmbeddedId], vv: model.ViewValueCommon)(implicit messageProvider: MessagesProvider, requestHeader: RequestHeader)
 

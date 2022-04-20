@@ -11,13 +11,13 @@ import java.time.LocalDateTime
 import Todo._
 
 case class Todo(
-                 id:               Option[Id],
-                 category_id:      Option[Int],
-                 title:            String,
-                 body:             String,
-                 state:            Status,
-                 updatedAt: LocalDateTime = NOW,
-                 createdAt: LocalDateTime = NOW
+                 id:          Option[Id],
+                 category_id: Option[Category.Id],
+                 title:       String,
+                 body:        String,
+                 state:       Status,
+                 updatedAt:   LocalDateTime = NOW,
+                 createdAt:   LocalDateTime = NOW
                ) extends EntityModel[Id]
 
 object Todo {
@@ -33,14 +33,14 @@ object Todo {
     case object DONE extends Status(code = 2, name = "DONE")
   }
 
-  def apply(category_id: Option[Int], title: String, body: String): WithNoId = {
+  def apply(category_id: Option[Category.Id], title: String, body: String): WithNoId = {
     new Entity.WithNoId(
       new Todo(
-        id = None,
+        id          = None,
         category_id = category_id,
-        title = title,
-        body = body,
-        state = Status(0),
+        title       = title,
+        body        = body,
+        state       = Status(0),
       )
     )
   }

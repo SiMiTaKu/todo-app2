@@ -1,21 +1,16 @@
 package controllers
 
-import lib.model.Todo
-import lib.persistence.CategoryRepository
+import lib.model.{Todo,Category}
+import lib.persistence.db.{TodoEditFormData, TodoFormData}
 
 import javax.inject._
 import play.api.mvc._
 import model.ViewValueHome
-import lib.persistence.default.TodoRepository
-import play.api.data.Forms.{mapping, nonEmptyText, number}
+import lib.persistence.default.{TodoRepository,CategoryRepository}
+import play.api.data.Forms.{mapping, nonEmptyText}
 import play.api.data.Form
 import play.api.i18n.I18nSupport
-
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
-
-case class TodoFormData(category: Int, title: String, body: String)
-case class TodoEditFormData(category: String, title: String, body: String, state: String)
 
 @Singleton
 class TodoController @Inject()(
@@ -23,20 +18,20 @@ class TodoController @Inject()(
   ) extends BaseController with I18nSupport {
 
   val error_vv = ViewValueHome(
-    title = "Error Page Not Found 404",
+    title  = "Error Page Not Found 404",
     cssSrc = Seq("main.css"),
-    jsSrc = Seq("main.js")
+    jsSrc  = Seq("main.js")
   )
 
   def list() = Action async{ implicit req =>
-    val vv = ViewValueHome(
-      title = "Todo List",
+    val vv  = ViewValueHome(
+      title  = "Todo List",
       cssSrc = Seq("main.css"),
-      jsSrc = Seq("main.js")
+      jsSrc  = Seq("main.js")
     )
     for{
-      results <- TodoRepository.getAll()
-      categories <- lib.persistence.default.CategoryRepository.getAll()
+      results    <- TodoRepository.getAll()
+      categories <- CategoryRepository.getAll()
     } yield{
       Ok(views.html.todo.list(results, categories, vv))
     }
@@ -49,8 +44,8 @@ class TodoController @Inject()(
       jsSrc  = Seq("main.js")
     )
     for{
-      todo <- TodoRepository.get(lib.model.Todo.Id(id))
-      categories <- lib.persistence.default.CategoryRepository.getAll()
+      todo       <- TodoRepository.get(lib.model.Todo.Id(id))
+      categories <- CategoryRepository.getAll()
     } yield {
       todo match {
         case Some(result) => Ok(views.html.todo.detail(result, categories, vv))
@@ -61,19 +56,23 @@ class TodoController @Inject()(
 
   val form = Form(
     mapping(
-      "category" -> number,
+      "category" -> nonEmptyText,
       "title"    -> nonEmptyText(maxLength = 140),
       "body"     -> nonEmptyText(maxLength = 200)
     )(TodoFormData.apply)(TodoFormData.unapply)
   )
 
-  def register() = Action{ implicit request: Request[AnyContent] =>
+  def register() = Action async{ implicit request: Request[AnyContent] =>
     val vv = ViewValueHome(
       title  = "Todo Register Form",
       cssSrc = Seq("main.css"),
       jsSrc  = Seq("main.js")
     )
-    Ok(views.html.todo.registerForm(form, vv))
+    for{
+      categories <- CategoryRepository.getAll()
+    } yield {
+      Ok(views.html.todo.registerForm(form, categories, vv))
+    }
   }
 
   def add() = Action async { implicit request: Request[AnyContent] =>
@@ -85,11 +84,15 @@ class TodoController @Inject()(
 
     form.bindFromRequest().fold(
       (formWithErrors: Form[TodoFormData]) =>{
-        Future.successful(BadRequest(views.html.todo.registerForm(formWithErrors, vv)))
+        for {
+          categories <- CategoryRepository.getAll()
+        } yield {
+          BadRequest(views.html.todo.registerForm(formWithErrors, categories, vv))
+        }
       },
       (todoFormData: TodoFormData) =>{
         for {
-          _ <- TodoRepository.add(Todo.apply(Some(todoFormData.category), todoFormData.title, todoFormData.body))
+          _ <- TodoRepository.add(Todo.apply(Some(Category.Id(todoFormData.category.toLong)), todoFormData.title, todoFormData.body))
         } yield {
           Redirect(routes.TodoController.list())
         }
@@ -112,7 +115,6 @@ class TodoController @Inject()(
   val editForm = Form(
     mapping(
       "category" -> nonEmptyText,
-
       "title"    -> nonEmptyText(maxLength = 140),
       "body"     -> nonEmptyText(maxLength = 200),
       "state"    -> nonEmptyText
@@ -127,7 +129,7 @@ class TodoController @Inject()(
     )
     for{
       todo <- TodoRepository.get(lib.model.Todo.Id(id))
-      categories <- lib.persistence.default.CategoryRepository.getAll()
+      categories <- CategoryRepository.getAll()
     } yield {
       todo match {
         case Some(result) =>
@@ -142,7 +144,7 @@ class TodoController @Inject()(
             categories,
             vv
           ))
-        case None         => NotFound(views.html.page404(error_vv))
+        case None => NotFound(views.html.page404(error_vv))
       }
     }
   }
@@ -166,11 +168,11 @@ class TodoController @Inject()(
 
       val todoEmbeddedID: Todo#EmbeddedId =
         new Todo(
-          id = Some(lib.model.Todo.Id(id)),
-          category_id = Some(data.category.toInt),
-          title = data.title,
-          body = data.body,
-          state = lib.model.Todo.Status(data.state.toShort)
+          id          = Some(lib.model.Todo.Id(id)),
+          category_id = Some(Category.Id(data.category.toLong)),
+          title       = data.title,
+          body        = data.body,
+          state       = lib.model.Todo.Status(data.state.toShort)
         ).toEmbeddedId
 
         for {
@@ -178,7 +180,7 @@ class TodoController @Inject()(
         } yield {
           count match {
             case None => NotFound(views.html.page404(error_vv))
-            case _ => Redirect(routes.TodoController.list)
+            case _    => Redirect(routes.TodoController.list)
           }
         }
       }

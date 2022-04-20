@@ -4,6 +4,10 @@ import java.time.LocalDateTime
 import slick.jdbc.JdbcProfile
 import ixias.persistence.model.Table
 import lib.model.Todo
+import lib.model.Category
+
+case class TodoFormData(category: String, title: String, body: String)
+case class TodoEditFormData(category: String, title: String, body: String, state: String)
 
 case class TodoTable[P <: JdbcProfile]()(implicit val driver: P)
   extends Table[Todo, P] {
@@ -20,7 +24,7 @@ case class TodoTable[P <: JdbcProfile]()(implicit val driver: P)
   class Table(tag: Tag) extends BasicTable(tag, "to_do") {
     import Todo._
     def id          = column[Id]            ("id",          O.UInt64, O.PrimaryKey, O.AutoInc)
-    def category_id = column[Int]           ("category_id", O.UInt64)
+    def category_id = column[Category.Id]   ("category_id", O.UInt64)
     def title       = column[String]        ("title",       O.Utf8Char255)
     def body        = column[String]        ("body",        O.Utf8Char255)
     def state       = column[Status]        ("state",       O.UInt8)
@@ -28,7 +32,7 @@ case class TodoTable[P <: JdbcProfile]()(implicit val driver: P)
     def createdAt   = column[LocalDateTime] ("created_at",  O.Ts)
 
     type TableElementTuple = (
-      Option[Id], Option[Int], String, String, Status, LocalDateTime, LocalDateTime
+      Option[Id], Option[Category.Id], String, String, Status, LocalDateTime, LocalDateTime
       )
 
     // DB <=> Scala の相互のmapping定義

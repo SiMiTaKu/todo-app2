@@ -47,7 +47,6 @@ body {
 .card{
   width: 100%;
   text-align: left;
-  cursor:  pointer;
   font-size: 13px;
   background-color: #c7c6c6;
   padding: 3px;
@@ -105,11 +104,8 @@ body {
   margin-left: 5px;
 }
 
-.card_footer .card_footer_item a:link,
-.card_footer .card_footer_item i {
-  color:     Black;
-  font-size: 0.9em;
-  cursor:    pointer;
+.card_footer {
+  cursor: pointer;
 }
 
 .card__content--item{
