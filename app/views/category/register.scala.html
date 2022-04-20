@@ -1,0 +1,20 @@
+@import lib.persistence.db.CategoryFormData
+@import lib.model.Category
+@(form: Form[CategoryFormData], categories: Seq[Category#EmbeddedId], vv: model.ViewValueCommon)(implicit messageProvider: MessagesProvider, requestHeader: RequestHeader)
+
+@common.Default(vv) {
+    @helper.form(action = controllers.routes.CategoryController.add) {
+        @helper.CSRF.formField
+        @helper.inputText(form("title"))
+        @helper.inputText(form("slug"))
+        @helper.inputRadioGroup(
+            form("color"),
+            options = Category.colorMap.map(color => (color._1.toString, color._2)).toSeq,
+            '_help -> ""
+        )
+        <input type="submit" value="Register">
+    }
+    <h2>
+        <a href = "/category/list">Back to todo list</a>
+    </h2>
+}

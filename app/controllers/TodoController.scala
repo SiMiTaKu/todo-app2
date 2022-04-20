@@ -5,7 +5,7 @@ import lib.persistence.db.{TodoEditFormData, TodoFormData}
 
 import javax.inject._
 import play.api.mvc._
-import model.ViewValueHome
+import model.{ViewValueHome,ViewValueList,ViewValueRegister,ViewValueDetail,ViewValueEdit, ViewValueError}
 import lib.persistence.default.{TodoRepository,CategoryRepository}
 import play.api.data.Forms.{mapping, nonEmptyText}
 import play.api.data.Form
@@ -17,14 +17,14 @@ class TodoController @Inject()(
     val controllerComponents: ControllerComponents
   ) extends BaseController with I18nSupport {
 
-  val error_vv = ViewValueHome(
+  val error_vv = ViewValueError(
     title  = "Error Page Not Found 404",
     cssSrc = Seq("main.css"),
     jsSrc  = Seq("main.js")
   )
 
   def list() = Action async{ implicit req =>
-    val vv  = ViewValueHome(
+    val vv  = ViewValueList(
       title  = "Todo List",
       cssSrc = Seq("main.css"),
       jsSrc  = Seq("main.js")
@@ -38,7 +38,7 @@ class TodoController @Inject()(
   }
 
   def detail(id: Long) = Action async { implicit request: Request[AnyContent] =>
-    val vv = ViewValueHome(
+    val vv = ViewValueDetail(
       title  = s"Detail  Todo No.${id}",
       cssSrc = Seq("main.css"),
       jsSrc  = Seq("main.js")
@@ -63,7 +63,7 @@ class TodoController @Inject()(
   )
 
   def register() = Action async{ implicit request: Request[AnyContent] =>
-    val vv = ViewValueHome(
+    val vv = ViewValueRegister(
       title  = "Todo Register Form",
       cssSrc = Seq("main.css"),
       jsSrc  = Seq("main.js")
@@ -71,12 +71,12 @@ class TodoController @Inject()(
     for{
       categories <- CategoryRepository.getAll()
     } yield {
-      Ok(views.html.todo.registerForm(form, categories, vv))
+      Ok(views.html.todo.register(form, categories, vv))
     }
   }
 
   def add() = Action async { implicit request: Request[AnyContent] =>
-    val vv = ViewValueHome(
+    val vv = ViewValueRegister(
       title  = "Todo Register Form",
       cssSrc = Seq("main.css"),
       jsSrc  = Seq("main.js")
@@ -87,7 +87,7 @@ class TodoController @Inject()(
         for {
           categories <- CategoryRepository.getAll()
         } yield {
-          BadRequest(views.html.todo.registerForm(formWithErrors, categories, vv))
+          BadRequest(views.html.todo.register(formWithErrors, categories, vv))
         }
       },
       (todoFormData: TodoFormData) =>{
@@ -122,7 +122,7 @@ class TodoController @Inject()(
   )
 
   def edit(id: Long) = Action async { implicit request: Request[AnyContent] =>
-    val vv = ViewValueHome(
+    val vv = ViewValueEdit(
       title  = s"Edit Todo ${id}",
       cssSrc = Seq("main.css"),
       jsSrc  = Seq("main.js")
@@ -150,7 +150,7 @@ class TodoController @Inject()(
   }
 
   def update(id: Long) = Action async { implicit request: Request[AnyContent] =>
-    val vv = ViewValueHome(
+    val vv = ViewValueEdit(
       title  = s"Edit Todo ${id}",
       cssSrc = Seq("main.css"),
       jsSrc  = Seq("main.js")

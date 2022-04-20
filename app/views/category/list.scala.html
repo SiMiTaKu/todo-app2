@@ -11,13 +11,16 @@
     @for(category <- categories){
 
         <div class = "card">
-            <div class = "card__content" style="background-color: #@Category.colorMap.get(category.v.color)">
+            <div class = "card__content" style="background-color: @Category.colorMap(category.v.color)">
                 <div class = "card__content--item">@category.v.name</div>
                 <div class = "card__content--item">@category.v.slug</div>
-                <div class = "card__content--item">@category.v.color</div>
+                <div class = "card__content--item">@Category.colorMap.get(category.v.color)</div>
             </div>
         </div>
     }
+    <h2>
+        <a href="/category/register">Category RegisterForm</a>
+    </h2>
     <h2>
         <a href = "/">Back To Home</a>
     </h2>

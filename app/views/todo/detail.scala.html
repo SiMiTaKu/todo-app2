@@ -2,7 +2,7 @@
 @import lib.model.Todo
 @(todo: Todo#EmbeddedId, categories: Seq[Category#EmbeddedId], vv: model.ViewValueCommon)(implicit messageProvider: MessagesProvider, requestHeader: RequestHeader)
 @common.Default(vv) {
-    <div class = "detail" style ="background-color: #@Category.colorMap(categories.filter(category => category.v.id == todo.v.category_id ).map(_.v.color).head)">
+    <div class = "detail" style ="background-color: @Category.colorMap(categories.filter(category => category.v.id == todo.v.category_id ).map(_.v.color).head)">
         <div class = "detail__list">
             <div class = "detail__list--item">@todo.v.title</div>
             <div class = "detail__list--item">@todo.v.body</div>

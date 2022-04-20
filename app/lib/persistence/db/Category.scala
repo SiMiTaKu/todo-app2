@@ -5,6 +5,8 @@ import slick.jdbc.JdbcProfile
 import ixias.persistence.model.Table
 import lib.model.Category
 
+case class CategoryFormData(title: String, slug: String, color: String)
+
 case class CategoryTable[P <: JdbcProfile]()(implicit val driver: P)
   extends Table[Category, P] {
   import api._
