@@ -5,7 +5,7 @@ import lib.persistence.db.{TodoEditFormData, TodoFormData}
 
 import javax.inject._
 import play.api.mvc._
-import model.{ViewValueHome,ViewValueList,ViewValueRegister,ViewValueDetail,ViewValueEdit, ViewValueError}
+import model.{ViewValueList,ViewValueRegister,ViewValueDetail,ViewValueEdit, ViewValueError}
 import lib.persistence.default.{TodoRepository,CategoryRepository}
 import play.api.data.Forms.{mapping, nonEmptyText}
 import play.api.data.Form
@@ -44,7 +44,7 @@ class TodoController @Inject()(
       jsSrc  = Seq("main.js")
     )
     for{
-      todo       <- TodoRepository.get(lib.model.Todo.Id(id))
+      todo       <- TodoRepository.get(Todo.Id(id))
       categories <- CategoryRepository.getAll()
     } yield {
       todo match {
@@ -128,7 +128,7 @@ class TodoController @Inject()(
       jsSrc  = Seq("main.js")
     )
     for{
-      todo <- TodoRepository.get(lib.model.Todo.Id(id))
+      todo <- TodoRepository.get(Todo.Id(id))
       categories <- CategoryRepository.getAll()
     } yield {
       todo match {
@@ -159,7 +159,7 @@ class TodoController @Inject()(
     editForm.bindFromRequest().fold(
       (formWithErrors: Form[TodoEditFormData]) => {
         for{
-          categories <- lib.persistence.default.CategoryRepository.getAll()
+          categories <- CategoryRepository.getAll()
         }yield{
           BadRequest(views.html.todo.edit(id, formWithErrors, categories, vv))
         }
@@ -168,7 +168,7 @@ class TodoController @Inject()(
 
       val todoEmbeddedID: Todo#EmbeddedId =
         new Todo(
-          id          = Some(lib.model.Todo.Id(id)),
+          id          = Some(Todo.Id(id)),
           category_id = Some(Category.Id(data.category.toLong)),
           title       = data.title,
           body        = data.body,

@@ -94,27 +94,40 @@ body {
   border-right: solid 1px #5d5d5d;
 }
 
-.card__footer {
-  text-align: right;
-  display: inline-block;
-}
-
-.card__footer .card__footer--item {
-  display:     inline-block;
-  margin-left: 5px;
-}
-
-.card_footer {
-  cursor: pointer;
-}
-
-.card__content--item{
-  width: 28%;
+.card__content--name{
+  width: 27%;
   padding: 5px;
   display: inline-block;
   text-align: center;
   border-left: solid 1px #5d5d5d;
   border-right: solid 1px #5d5d5d;
+}
+.card__content--slug{
+  width: 27%;
+  padding: 5px;
+  display: inline-block;
+  text-align: center;
+  border-left: solid 1px #5d5d5d;
+}
+.card__content--color{
+  width: 27%;
+  padding: 5px;
+  display: inline-block;
+  text-align: center;
+  border-left: solid 1px #5d5d5d;
+  border-right: solid 1px #5d5d5d;
+}
+
+.card__footer {
+  text-align: right;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.card__footer .card__footer--item {
+  display:     inline-block;
+  margin-left: 5px;
+  cursor: pointer;
 }
 
 

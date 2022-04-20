@@ -1,0 +1,20 @@
+@import lib.persistence.db.CategoryFormData
+@import lib.model.Category
+@(id: Long, form: Form[CategoryFormData], vv: model.ViewValueCommon)(implicit messageProvider: MessagesProvider, requestHeader: RequestHeader)
+
+@common.Default(vv) {
+    @helper.form(action = controllers.routes.CategoryController.update(id)) {
+        @helper.CSRF.formField
+        @helper.inputText(form("title"))
+        @helper.inputText(form("slug"))
+        @helper.inputRadioGroup(
+            form("color"),
+            options = Category.colorMap.map(color => (color._1.toString, color._2)).toSeq,
+            '_help -> ""
+        )
+        <input type="submit" value="Update">
+    }
+    <h2>
+        <a href = "/category/list">Back to category list</a>
+    </h2>
+}
