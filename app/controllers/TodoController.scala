@@ -1,13 +1,13 @@
 package controllers
 
 import lib.model.{Todo,Category}
-import lib.persistence.db.{TodoEditFormData, TodoFormData}
-
+import lib.formData.{TodoEditFormData, TodoFormData}
+import lib.formData.formData.{editForm, form}
 import javax.inject._
 import play.api.mvc._
 import model.{ViewValueList,ViewValueRegister,ViewValueDetail,ViewValueEdit, ViewValueError}
 import lib.persistence.default.{TodoRepository,CategoryRepository}
-import play.api.data.Forms.{mapping, nonEmptyText}
+
 import play.api.data.Form
 import play.api.i18n.I18nSupport
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -54,14 +54,6 @@ class TodoController @Inject()(
     }
   }
 
-  val form = Form(
-    mapping(
-      "category" -> nonEmptyText,
-      "title"    -> nonEmptyText(maxLength = 140),
-      "body"     -> nonEmptyText(maxLength = 200)
-    )(TodoFormData.apply)(TodoFormData.unapply)
-  )
-
   def register() = Action async{ implicit request: Request[AnyContent] =>
     val vv = ViewValueRegister(
       title  = "Todo Register Form",
@@ -103,7 +95,7 @@ class TodoController @Inject()(
   def remove() = Action async {implicit request: Request[AnyContent] =>
     val id = request.body.asFormUrlEncoded.get("id").headOption.get.toLong
     for {
-      result <- TodoRepository.remove(lib.model.Todo.Id(id))
+      result <- TodoRepository.remove(Todo.Id(id))
     } yield {
       result match {
         case Some(result) => Redirect(routes.TodoController.list)
@@ -111,15 +103,6 @@ class TodoController @Inject()(
       }
     }
   }
-
-  val editForm = Form(
-    mapping(
-      "category" -> nonEmptyText,
-      "title"    -> nonEmptyText(maxLength = 140),
-      "body"     -> nonEmptyText(maxLength = 200),
-      "state"    -> nonEmptyText
-    )(TodoEditFormData.apply)(TodoEditFormData.unapply)
-  )
 
   def edit(id: Long) = Action async { implicit request: Request[AnyContent] =>
     val vv = ViewValueEdit(
@@ -149,6 +132,8 @@ class TodoController @Inject()(
     }
   }
 
+
+
   def update(id: Long) = Action async { implicit request: Request[AnyContent] =>
     val vv = ViewValueEdit(
       title  = s"Edit Todo ${id}",
@@ -165,22 +150,21 @@ class TodoController @Inject()(
         }
       },
     (data: TodoEditFormData) => {
-
-      val todoEmbeddedID: Todo#EmbeddedId =
-        new Todo(
-          id          = Some(Todo.Id(id)),
-          category_id = Some(Category.Id(data.category.toLong)),
-          title       = data.title,
-          body        = data.body,
-          state       = lib.model.Todo.Status(data.state.toShort)
-        ).toEmbeddedId
-
         for {
-          count <- TodoRepository.update(todoEmbeddedID)
+          old   <- TodoRepository.get(Todo.Id(id))
         } yield {
-          count match {
+          old match {
             case None => NotFound(views.html.page404(error_vv))
-            case _    => Redirect(routes.TodoController.list)
+            case _    => TodoRepository.update(
+              Todo(
+                id          = old.get.v.id,
+                category_id = Some(Category.Id(data.category.toLong)),
+                title       = data.title,
+                body        = data.body,
+                state       = lib.model.Todo.Status(data.state.toShort)
+              ).toEmbeddedId
+            )
+              Redirect(routes.TodoController.list)
           }
         }
       }

@@ -33,3 +33,5 @@ POST    /category/register             controllers.CategoryController.add
 GET     /category/$id<[0-9]+>/edit     controllers.CategoryController.edit(id: Long)
 
 POST    /category/$id<[0-9]+>/update   controllers.CategoryController.update(id: Long)
+
+POST    /category/remove               controllers.CategoryController.remove

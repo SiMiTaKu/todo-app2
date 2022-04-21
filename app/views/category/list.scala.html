@@ -11,17 +11,24 @@
     @for(category <- categories){
 
         <div class = "card">
-            <div class = "card__content" style="background-color: @Category.colorMap(category.v.color)">
+            <div class = "card__content" style="background-color: @Category.ColorMap(category.v.color.toShort)">
                 <div class = "card__content--name">@category.v.name</div>
                 <div class = "card__content--slug">@category.v.slug</div>
-                <div class = "card__content--color">@Category.colorMap.get(category.v.color)</div>
+                <div class = "card__content--color">@Category.ColorMap(category.v.color.toShort)</div>
 
                 <div class = "card__footer">
                     <div class = "card__footer--item">
-                    @helper.form(action = controllers.routes.CategoryController.edit(category.v.id.getOrElse(0))){
+                    @helper.form(action = controllers.routes.CategoryController.edit(category.id)){
                         @helper.CSRF.formField
                         <input type="hidden" value="@category.id" name="id">
                         <input type="submit" value="Edit">
+                        }
+                    </div>
+                    <div class = "card__footer--item">
+                    @helper.form(action = controllers.routes.CategoryController.remove) {
+                        @helper.CSRF.formField
+                        <input type="hidden" value="@category.id" name="id">
+                        <input type="submit" value="Remove">
                         }
                     </div>
                 </div>

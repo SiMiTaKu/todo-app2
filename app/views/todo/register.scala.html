@@ -1,5 +1,5 @@
-@import lib.persistence.db.TodoFormData
 @import lib.model.Category
+@import lib.formData.TodoFormData
 @(form: Form[TodoFormData], categories: Seq[Category#EmbeddedId], vv: model.ViewValueCommon)(implicit messageProvider: MessagesProvider, requestHeader: RequestHeader)
 
 @common.Default(vv) {

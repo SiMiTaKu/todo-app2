@@ -6,9 +6,6 @@ import ixias.persistence.model.Table
 import lib.model.Todo
 import lib.model.Category
 
-case class TodoFormData(category: String, title: String, body: String)
-case class TodoEditFormData(category: String, title: String, body: String, state: String)
-
 case class TodoTable[P <: JdbcProfile]()(implicit val driver: P)
   extends Table[Todo, P] {
   import api._

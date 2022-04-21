@@ -14,7 +14,7 @@
     </div>
     @for(todo <- todos) {
         <div class = "card">
-            <div class = "card__content" style ="background-color: @Category.colorMap(categories.filter(category => category.v.id == todo.v.category_id ).map(_.v.color).head);">
+            <div class = "card__content" style ="background-color: @Category.ColorMap(categories.filter(category => category.v.id == todo.v.category_id ).map(_.v.color).headOption.getOrElse(1).toShort);">
                 <div class = "card__content--id">@todo.v.id</div>
                 <div class = "card__content--title">@todo.v.title</div>
                 <div class = "card__content--body">@todo.v.body</div>
@@ -25,14 +25,14 @@
 
                 <div class = "card__footer">
                     <div class = "card__footer--item">
-                        @helper.form(action = controllers.routes.TodoController.detail(todo.v.id.getOrElse(0))) {
+                        @helper.form(action = controllers.routes.TodoController.detail(todo.id)) {
                             @helper.CSRF.formField
                             <input type="hidden" value="@todo.id" name="id">
                             <input type="submit" value="Detail">
                         }
                     </div>
                     <div class = "card__footer--item">
-                        @helper.form(action = controllers.routes.TodoController.edit(todo.v.id.getOrElse(0))){
+                        @helper.form(action = controllers.routes.TodoController.edit(todo.id)){
                             @helper.CSRF.formField
                             <input type="hidden" value="@todo.id" name="id">
                             <input type="submit" value="Edit">

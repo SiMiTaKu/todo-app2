@@ -1,18 +1,20 @@
 package controllers
 
 import lib.model.{Category, Todo}
-import lib.persistence.default.CategoryRepository
-import lib.persistence.db.CategoryFormData
+import lib.persistence.default.{CategoryRepository, TodoRepository}
+import lib.formData.CategoryFormData
+import lib.formData.formData.categoryForm
 
 import javax.inject._
 import play.api.mvc.{BaseController, _}
-import model.{ViewValueDetail, ViewValueEdit, ViewValueError, ViewValueHome, ViewValueList, ViewValueRegister}
-import play.api.data.{Form, Forms}
-import play.api.data.Forms.{mapping, nonEmptyText}
+import model.{ViewValueEdit, ViewValueError, ViewValueList, ViewValueRegister}
+import play.api.data.Form
 import play.api.i18n.I18nSupport
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.duration.{Duration, DurationInt}
+import scala.concurrent.{Await, Future}
+
 
 @Singleton
 class CategoryController @Inject()(
@@ -37,15 +39,6 @@ class CategoryController @Inject()(
       Ok(views.html.category.list(results, vv))
     }
   }
-
-
-  val categoryForm = Form(
-    mapping(
-      "title" -> nonEmptyText(maxLength = 140),
-      "slug"  -> nonEmptyText(maxLength = 140),
-      "color" -> nonEmptyText
-    )(CategoryFormData.apply)(CategoryFormData.unapply)
-  )
 
   def register() = Action async{ implicit request: Request[AnyContent] =>
     val vv = ViewValueRegister(
@@ -108,6 +101,7 @@ class CategoryController @Inject()(
         case None => NotFound(views.html.page404(error_vv))
       }
     }
+
   }
 
   def update(id: Long) = Action async { implicit request: Request[AnyContent] =>
@@ -121,24 +115,48 @@ class CategoryController @Inject()(
         Future.successful(BadRequest(views.html.category.edit(id, formWithErrors, vv)))
       },
       (data: CategoryFormData) => {
-
-        val CategoryEmbeddedID: Category#EmbeddedId =
-          new Category(
-            id    = Some(Category.Id(id)),
-            name  = data.title,
-            slug  = data.slug,
-            color = data.color.toInt,
-          ).toEmbeddedId
-
-        for {
-          count <- CategoryRepository.update(CategoryEmbeddedID)
+        for{
+          old <- CategoryRepository.get(Category.Id(id))
         } yield {
-          count match {
+          old match {
             case None => NotFound(views.html.page404(error_vv))
-            case _    => Redirect(routes.CategoryController.list)
+            case _    => CategoryRepository.update(
+              Category(
+                id    = old.get.v.id,
+                name  = data.title,
+                slug  = data.slug,
+                color = data.color.toInt,
+              ).toEmbeddedId
+            )
+              Redirect(routes.CategoryController.list)
           }
         }
       }
     )
+  }
+
+
+
+  def remove() = Action{ implicit request: Request[AnyContent] =>
+    val id = request.body.asFormUrlEncoded.get("id").headOption.get.toLong
+    val deleteTodo = for{
+      todos <- TodoRepository.getAll()
+    } yield {
+      for(todo <- todos.filter(todo => todo.v.category_id.get.toLong == id)){
+        TodoRepository.remove(Todo.Id(todo.v.id.get.toLong))
+      }
+    }
+
+    val deleteCategory = for {
+      categoryRemove <- CategoryRepository.remove(Category.Id(id))
+    } yield {
+      categoryRemove match {
+        case None    => NotFound(views.html.page404(error_vv))
+        case Some(_) =>
+      }
+    }
+    Await.ready(deleteTodo, Duration.Inf)
+    Await.ready(deleteCategory, Duration.Inf)
+    Redirect(routes.CategoryController.list)
   }
 }

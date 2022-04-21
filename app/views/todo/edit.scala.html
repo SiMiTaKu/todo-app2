@@ -1,5 +1,6 @@
-@import lib.persistence.db.TodoEditFormData
 @import lib.model.Category
+@import lib.formData.TodoEditFormData
+@import lib.model.Todo
 @(id: Long, form: Form[TodoEditFormData], categories: Seq[Category#EmbeddedId], vv: model.ViewValueCommon)(implicit messageProvider: MessagesProvider, requestHeader: RequestHeader)
 
 @common.Default(vv) {
@@ -16,7 +17,7 @@
             '_label -> "body", '_showConstraints -> false)
         @helper.inputRadioGroup(
             form("state"),
-            options = helper.options(("0", "TODO"), ("1", "RUN"), ("2", "DONE")),
+            options = Todo.Status.map1.toSeq.map(status => (status._2.code.toString, status._2.name)),
             '_help -> ""
         )
         <input type="submit" value="Update">
