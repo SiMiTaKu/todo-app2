@@ -29,11 +29,12 @@ class TodoController @Inject()(
       cssSrc = Seq("main.css"),
       jsSrc  = Seq("main.js")
     )
+    val todos = TodoRepository.getAll()
     for{
-      results    <- TodoRepository.getAll()
+      todoList   <- todos
       categories <- CategoryRepository.getAll()
     } yield{
-      Ok(views.html.todo.list(results, categories, vv))
+      Ok(views.html.todo.list(todoList, categories, vv))
     }
   }
 
@@ -43,8 +44,10 @@ class TodoController @Inject()(
       cssSrc = Seq("main.css"),
       jsSrc  = Seq("main.js")
     )
+    val todoGet = TodoRepository.get(Todo.Id(id))
+
     for{
-      todo       <- TodoRepository.get(Todo.Id(id))
+      todo       <- todoGet
       categories <- CategoryRepository.getAll()
     } yield {
       todo match {
@@ -84,7 +87,7 @@ class TodoController @Inject()(
       },
       (todoFormData: TodoFormData) =>{
         for {
-          _ <- TodoRepository.add(Todo.apply(Some(Category.Id(todoFormData.category.toLong)), todoFormData.title, todoFormData.body))
+          _ <- TodoRepository.add(Todo.apply(Category.Id(todoFormData.category.toLong), todoFormData.title, todoFormData.body))
         } yield {
           Redirect(routes.TodoController.list())
         }
@@ -92,8 +95,7 @@ class TodoController @Inject()(
     )
   }
 
-  def remove() = Action async {implicit request: Request[AnyContent] =>
-    val id = request.body.asFormUrlEncoded.get("id").headOption.get.toLong
+  def remove(id: Long) = Action async {implicit request: Request[AnyContent] =>
     for {
       result <- TodoRepository.remove(Todo.Id(id))
     } yield {
@@ -110,8 +112,11 @@ class TodoController @Inject()(
       cssSrc = Seq("main.css"),
       jsSrc  = Seq("main.js")
     )
+
+    val todoGet = TodoRepository.get(Todo.Id(id))
+
     for{
-      todo <- TodoRepository.get(Todo.Id(id))
+      todo <- todoGet
       categories <- CategoryRepository.getAll()
     } yield {
       todo match {
@@ -119,7 +124,7 @@ class TodoController @Inject()(
           Ok(views.html.todo.edit(
             id,
             editForm.fill(TodoEditFormData(
-              result.v.category_id.get.toString,
+              result.v.category_id.toString,
               result.v.title,
               result.v.body,
               result.v.state.toString
@@ -154,11 +159,11 @@ class TodoController @Inject()(
           old   <- TodoRepository.get(Todo.Id(id))
         } yield {
           old match {
-            case None => NotFound(views.html.page404(error_vv))
-            case _    => TodoRepository.update(
+            case None      => NotFound(views.html.page404(error_vv))
+            case Some(old) => TodoRepository.update(
               Todo(
-                id          = old.get.v.id,
-                category_id = Some(Category.Id(data.category.toLong)),
+                id          = old.v.id,
+                category_id = Category.Id(data.category.toLong),
                 title       = data.title,
                 body        = data.body,
                 state       = lib.model.Todo.Status(data.state.toShort)

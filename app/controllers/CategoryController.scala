@@ -12,8 +12,7 @@ import play.api.data.Form
 import play.api.i18n.I18nSupport
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration.{Duration, DurationInt}
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Future
 
 
 @Singleton
@@ -70,7 +69,7 @@ class CategoryController @Inject()(
       },
       (categoryFormData: CategoryFormData) =>{
         for {
-          _ <- CategoryRepository.add(Category.apply(categoryFormData.title, categoryFormData.slug, categoryFormData.color.toInt))
+          _ <- CategoryRepository.add(Category.apply(categoryFormData.title, categoryFormData.slug, Category.ColorMap(categoryFormData.color.toShort)))
         } yield {
           Redirect(routes.CategoryController.list())
         }
@@ -119,13 +118,13 @@ class CategoryController @Inject()(
           old <- CategoryRepository.get(Category.Id(id))
         } yield {
           old match {
-            case None => NotFound(views.html.page404(error_vv))
-            case _    => CategoryRepository.update(
+            case None      => NotFound(views.html.page404(error_vv))
+            case Some(old) => CategoryRepository.update(
               Category(
-                id    = old.get.v.id,
+                id    = old.v.id,
                 name  = data.title,
                 slug  = data.slug,
-                color = data.color.toInt,
+                color = Category.ColorMap(data.color.toShort),
               ).toEmbeddedId
             )
               Redirect(routes.CategoryController.list)
@@ -137,26 +136,23 @@ class CategoryController @Inject()(
 
 
 
-  def remove() = Action{ implicit request: Request[AnyContent] =>
-    val id = request.body.asFormUrlEncoded.get("id").headOption.get.toLong
-    val deleteTodo = for{
+  def remove(id: Long) = Action async { implicit request: Request[AnyContent] =>
+
+    for{
       todos <- TodoRepository.getAll()
     } yield {
-      for(todo <- todos.filter(todo => todo.v.category_id.get.toLong == id)){
-        TodoRepository.remove(Todo.Id(todo.v.id.get.toLong))
+      for(todo <- todos.filter(todo => todo.v.category_id.toLong == id)){
+          todo.v.id.map(todoId => TodoRepository.remove(todoId))
       }
     }
 
-    val deleteCategory = for {
+    for {
       categoryRemove <- CategoryRepository.remove(Category.Id(id))
     } yield {
       categoryRemove match {
-        case None    => NotFound(views.html.page404(error_vv))
-        case Some(_) =>
+        case None                 => NotFound(views.html.page404(error_vv))
+        case Some(categoryRemove) => Redirect(routes.CategoryController.list)
       }
     }
-    Await.ready(deleteTodo, Duration.Inf)
-    Await.ready(deleteCategory, Duration.Inf)
-    Redirect(routes.CategoryController.list)
   }
 }

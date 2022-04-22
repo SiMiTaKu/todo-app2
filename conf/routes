@@ -18,7 +18,7 @@ POST    /todo/register                 controllers.TodoController.add
 
 GET     /todo/$id<[0-9]+>              controllers.TodoController.detail(id: Long)
 
-POST    /todo/remove                   controllers.TodoController.remove
+POST    /todo/$id<[0-9]+>remove        controllers.TodoController.remove(id:Long)
 
 GET     /todo/$id<[0-9]+>/edit         controllers.TodoController.edit(id: Long)
 
@@ -34,4 +34,4 @@ GET     /category/$id<[0-9]+>/edit     controllers.CategoryController.edit(id: L
 
 POST    /category/$id<[0-9]+>/update   controllers.CategoryController.update(id: Long)
 
-POST    /category/remove               controllers.CategoryController.remove
+POST    /category/$id<[0-9]+>/remove   controllers.CategoryController.remove(id: Long)

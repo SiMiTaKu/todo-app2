@@ -10,7 +10,7 @@ case class Category(
                  id:              Option[Id],
                  name:            String,
                  slug:            String,
-                 color:           Int,
+                 color:           ColorMap,
                  updatedAt: LocalDateTime = NOW,
                  createdAt: LocalDateTime = NOW
                ) extends EntityModel[Id]
@@ -33,7 +33,7 @@ object Category {
 
   //val colorMap = Map(1 ->"LightSalmon", 2 -> "LightYellow", 3 -> "Aquamarine", 4 -> "SkyBlue", 5 -> "LightPink", 6 -> "Violet")
 
-  def apply(name: String, slug: String, color: Int): WithNoId = {
+  def apply(name: String, slug: String, color: ColorMap): WithNoId = {
     new Entity.WithNoId(
       new Category(
         id    = None,

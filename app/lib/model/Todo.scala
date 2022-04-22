@@ -12,7 +12,7 @@ import Todo._
 
 case class Todo(
                  id:          Option[Id],
-                 category_id: Option[Category.Id],
+                 category_id: Category.Id,
                  title:       String,
                  body:        String,
                  state:       Status,
@@ -33,7 +33,7 @@ object Todo {
     case object DONE extends Status(code = 2, name = "DONE")
   }
 
-  def apply(category_id: Option[Category.Id], title: String, body: String): WithNoId = {
+  def apply(category_id: Category.Id, title: String, body: String): WithNoId = {
     new Entity.WithNoId(
       new Todo(
         id          = None,
