@@ -70,16 +70,16 @@ class CategoryController @Inject()(
       jsSrc  = Seq("main.js")
     )
     CategoryRepository.get(Category.Id(id)).map{
-      case None => NotFound(views.html.page404(error_vv))
+      case None         => NotFound(views.html.page404(error_vv))
       case Some(result) => Ok(views.html.category.edit(
-        id,
-        categoryForm.fill(CategoryFormData(
-          result.v.name,
-          result.v.slug,
-          result.v.color.toString
-        )),
-        vv
-      ))
+                             id,
+                             categoryForm.fill(CategoryFormData(
+                               result.v.name,
+                               result.v.slug,
+                               result.v.color.toString
+                             )),
+                             vv
+                           ))
     }
   }
 
@@ -95,17 +95,16 @@ class CategoryController @Inject()(
         Future.successful(BadRequest(views.html.category.edit(id, formWithErrors, vv)))
       },
       (data: CategoryFormData) => {
-        CategoryRepository.get(Category.Id(id)).map{
-          case None      => NotFound(views.html.page404(error_vv))
-          case Some(old) => CategoryRepository.update(
-            Category(
-              id    = old.v.id,
-              name  = data.title,
-              slug  = data.slug,
-              color = Category.ColorMap(data.color.toShort),
-            ).toEmbeddedId
-          )
-          Redirect(routes.CategoryController.list)
+        CategoryRepository.update(
+          Category(
+            id    = Some(Category.Id(id)),
+            name  = data.title,
+            slug  = data.slug,
+            color = Category.ColorMap(data.color.toShort),
+          ).toEmbeddedId
+        ).map {
+          case None => NotFound(views.html.page404(error_vv))
+          case _ => Redirect(routes.CategoryController.list)
         }
       }
     )

@@ -109,19 +109,18 @@ class TodoController @Inject()(
       categories <- CategoryRepository.getAll()
     } yield {
       todo match {
-        case Some(result) =>
-          Ok(views.html.todo.edit(
-            id,
-            editForm.fill(TodoEditFormData(
-              result.v.category_id.toString,
-              result.v.title,
-              result.v.body,
-              result.v.state.toString
-            )),
-            categories,
-            vv
-          ))
-        case None => NotFound(views.html.page404(error_vv))
+        case None         => NotFound(views.html.page404(error_vv))
+        case Some(result) => Ok(views.html.todo.edit(
+                               id,
+                               editForm.fill(TodoEditFormData(
+                                 result.v.category_id.toString,
+                                 result.v.title,
+                                 result.v.body,
+                                 result.v.state.toString
+                               )),
+                               categories,
+                               vv
+                             ))
       }
     }
   }
@@ -142,18 +141,17 @@ class TodoController @Inject()(
         }
       },
     (data: TodoEditFormData) => {
-      TodoRepository.get(Todo.Id(id)).map {
+      TodoRepository.update(
+        Todo(
+          id = Some(Todo.Id(id)),
+          category_id = Category.Id(data.category.toLong),
+          title = data.title,
+          body = data.body,
+          state = lib.model.Todo.Status(data.state.toShort)
+        ).toEmbeddedId
+      ).map{
         case None => NotFound(views.html.page404(error_vv))
-        case Some(old) => TodoRepository.update(
-          Todo(
-            id = old.v.id,
-            category_id = Category.Id(data.category.toLong),
-            title = data.title,
-            body = data.body,
-            state = lib.model.Todo.Status(data.state.toShort)
-          ).toEmbeddedId
-        )
-          Redirect(routes.TodoController.list)
+        case _    => Redirect(routes.TodoController.list)
       }
     })
   }
