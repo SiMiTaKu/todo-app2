@@ -32,11 +32,7 @@ class CategoryController @Inject()(
       cssSrc = Seq("main.css"),
       jsSrc  = Seq("main.js")
     )
-    for{
-      results <- CategoryRepository.getAll()
-    } yield{
-      Ok(views.html.category.list(results, vv))
-    }
+    CategoryRepository.getAll().map{ categories => Ok(views.html.category.list(categories, vv))}
   }
 
   def register() = Action async{ implicit request: Request[AnyContent] =>
@@ -45,11 +41,7 @@ class CategoryController @Inject()(
       cssSrc = Seq("main.css"),
       jsSrc  = Seq("main.js")
     )
-    for{
-      categories <- CategoryRepository.getAll()
-    } yield {
-      Ok(views.html.category.register(categoryForm, categories, vv))
-    }
+    CategoryRepository.getAll().map{ categories => Ok(views.html.category.register(categoryForm, categories, vv))}
   }
 
   def add() = Action async { implicit request: Request[AnyContent] =>
@@ -61,16 +53,10 @@ class CategoryController @Inject()(
 
     categoryForm.bindFromRequest().fold(
       (formWithErrors: Form[CategoryFormData]) =>{
-        for {
-          categories <- CategoryRepository.getAll()
-        } yield {
-          BadRequest(views.html.category.register(formWithErrors, categories, vv))
-        }
+        CategoryRepository.getAll().map(categories => BadRequest(views.html.category.register(formWithErrors, categories, vv)))
       },
       (categoryFormData: CategoryFormData) =>{
-        for {
-          _ <- CategoryRepository.add(Category.apply(categoryFormData.title, categoryFormData.slug, Category.ColorMap(categoryFormData.color.toShort)))
-        } yield {
+        CategoryRepository.add(Category.apply(categoryFormData.title, categoryFormData.slug, Category.ColorMap(categoryFormData.color.toShort))).map{_ =>
           Redirect(routes.CategoryController.list())
         }
       }
@@ -83,24 +69,18 @@ class CategoryController @Inject()(
       cssSrc = Seq("main.css"),
       jsSrc  = Seq("main.js")
     )
-    for {
-      category <- CategoryRepository.get(Category.Id(id))
-    } yield {
-      category match {
-        case Some(result) =>
-          Ok(views.html.category.edit(
-            id,
-            categoryForm.fill(CategoryFormData(
-              result.v.name,
-              result.v.slug,
-              result.v.color.toString
-            )),
-            vv
-          ))
-        case None => NotFound(views.html.page404(error_vv))
-      }
+    CategoryRepository.get(Category.Id(id)).map{
+      case None => NotFound(views.html.page404(error_vv))
+      case Some(result) => Ok(views.html.category.edit(
+        id,
+        categoryForm.fill(CategoryFormData(
+          result.v.name,
+          result.v.slug,
+          result.v.color.toString
+        )),
+        vv
+      ))
     }
-
   }
 
   def update(id: Long) = Action async { implicit request: Request[AnyContent] =>
@@ -109,26 +89,23 @@ class CategoryController @Inject()(
       cssSrc = Seq("main.css"),
       jsSrc  = Seq("main.js")
     )
+
     categoryForm.bindFromRequest().fold(
       (formWithErrors: Form[CategoryFormData]) => {
         Future.successful(BadRequest(views.html.category.edit(id, formWithErrors, vv)))
       },
       (data: CategoryFormData) => {
-        for{
-          old <- CategoryRepository.get(Category.Id(id))
-        } yield {
-          old match {
-            case None      => NotFound(views.html.page404(error_vv))
-            case Some(old) => CategoryRepository.update(
-              Category(
-                id    = old.v.id,
-                name  = data.title,
-                slug  = data.slug,
-                color = Category.ColorMap(data.color.toShort),
-              ).toEmbeddedId
-            )
-              Redirect(routes.CategoryController.list)
-          }
+        CategoryRepository.get(Category.Id(id)).map{
+          case None      => NotFound(views.html.page404(error_vv))
+          case Some(old) => CategoryRepository.update(
+            Category(
+              id    = old.v.id,
+              name  = data.title,
+              slug  = data.slug,
+              color = Category.ColorMap(data.color.toShort),
+            ).toEmbeddedId
+          )
+          Redirect(routes.CategoryController.list)
         }
       }
     )
@@ -137,22 +114,16 @@ class CategoryController @Inject()(
 
 
   def remove(id: Long) = Action async { implicit request: Request[AnyContent] =>
-
-    for{
-      todos <- TodoRepository.getAll()
-    } yield {
-      for(todo <- todos.filter(todo => todo.v.category_id.toLong == id)){
-          todo.v.id.map(todoId => TodoRepository.remove(todoId))
-      }
+    TodoRepository.getAll().map{
+      case Nil     => NotFound(views.html.page404(error_vv))
+      case todos   => for(todo <- todos.filter(todo => todo.v.category_id.toLong == id)){
+                        todo.v.id.map(todoId => TodoRepository.remove(todoId))
+                      }
     }
 
-    for {
-      categoryRemove <- CategoryRepository.remove(Category.Id(id))
-    } yield {
-      categoryRemove match {
-        case None                 => NotFound(views.html.page404(error_vv))
-        case Some(categoryRemove) => Redirect(routes.CategoryController.list)
-      }
+    CategoryRepository.remove(Category.Id(id)).map{
+      case None                 => NotFound(views.html.page404(error_vv))
+      case Some(categoryRemove) => Redirect(routes.CategoryController.list)
     }
   }
 }

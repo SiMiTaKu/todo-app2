@@ -17,7 +17,7 @@
             '_label -> "body", '_showConstraints -> false)
         @helper.inputRadioGroup(
             form("state"),
-            options = Todo.Status.map1.toSeq.map(status => (status._2.code.toString, status._2.name)),
+            options = Todo.Status.values.map(status => (status.code.toString, status.name)),
             '_help -> ""
         )
         <input type="submit" value="Update">

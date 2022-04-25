@@ -63,9 +63,7 @@ class TodoController @Inject()(
       cssSrc = Seq("main.css"),
       jsSrc  = Seq("main.js")
     )
-    for{
-      categories <- CategoryRepository.getAll()
-    } yield {
+    CategoryRepository.getAll().map { categories =>
       Ok(views.html.todo.register(form, categories, vv))
     }
   }
@@ -79,16 +77,11 @@ class TodoController @Inject()(
 
     form.bindFromRequest().fold(
       (formWithErrors: Form[TodoFormData]) =>{
-        for {
-          categories <- CategoryRepository.getAll()
-        } yield {
-          BadRequest(views.html.todo.register(formWithErrors, categories, vv))
+        CategoryRepository.getAll().map { categories => BadRequest(views.html.todo.register(formWithErrors, categories, vv))
         }
       },
       (todoFormData: TodoFormData) =>{
-        for {
-          _ <- TodoRepository.add(Todo.apply(Category.Id(todoFormData.category.toLong), todoFormData.title, todoFormData.body))
-        } yield {
+        TodoRepository.add(Todo.apply(Category.Id(todoFormData.category.toLong), todoFormData.title, todoFormData.body)).map{ _ =>
           Redirect(routes.TodoController.list())
         }
       }
@@ -96,13 +89,9 @@ class TodoController @Inject()(
   }
 
   def remove(id: Long) = Action async {implicit request: Request[AnyContent] =>
-    for {
-      result <- TodoRepository.remove(Todo.Id(id))
-    } yield {
-      result match {
-        case Some(result) => Redirect(routes.TodoController.list)
-        case None         => NotFound(views.html.page404(error_vv))
-      }
+    TodoRepository.remove(Todo.Id(id)).map {
+      case Some(result) => Redirect(routes.TodoController.list)
+      case None         => NotFound(views.html.page404(error_vv))
     }
   }
 
@@ -148,31 +137,24 @@ class TodoController @Inject()(
 
     editForm.bindFromRequest().fold(
       (formWithErrors: Form[TodoEditFormData]) => {
-        for{
-          categories <- CategoryRepository.getAll()
-        }yield{
+        CategoryRepository.getAll().map{ categories =>
           BadRequest(views.html.todo.edit(id, formWithErrors, categories, vv))
         }
       },
     (data: TodoEditFormData) => {
-        for {
-          old   <- TodoRepository.get(Todo.Id(id))
-        } yield {
-          old match {
-            case None      => NotFound(views.html.page404(error_vv))
-            case Some(old) => TodoRepository.update(
-              Todo(
-                id          = old.v.id,
-                category_id = Category.Id(data.category.toLong),
-                title       = data.title,
-                body        = data.body,
-                state       = lib.model.Todo.Status(data.state.toShort)
-              ).toEmbeddedId
-            )
-              Redirect(routes.TodoController.list)
-          }
-        }
+      TodoRepository.get(Todo.Id(id)).map {
+        case None => NotFound(views.html.page404(error_vv))
+        case Some(old) => TodoRepository.update(
+          Todo(
+            id = old.v.id,
+            category_id = Category.Id(data.category.toLong),
+            title = data.title,
+            body = data.body,
+            state = lib.model.Todo.Status(data.state.toShort)
+          ).toEmbeddedId
+        )
+          Redirect(routes.TodoController.list)
       }
-    )
+    })
   }
 }
