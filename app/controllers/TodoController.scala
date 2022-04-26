@@ -141,6 +141,10 @@ class TodoController @Inject()(
         }
       },
     (data: TodoEditFormData) => {
+      TodoRepository.get(Todo.Id(id)).map {
+        case None    => NotFound(views.html.page404(error_vv))
+        case Some(_) => Redirect(routes.TodoController.list())
+      }
       TodoRepository.update(
         Todo(
           id = Some(Todo.Id(id)),

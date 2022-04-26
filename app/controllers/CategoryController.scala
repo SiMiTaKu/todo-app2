@@ -95,6 +95,11 @@ class CategoryController @Inject()(
         Future.successful(BadRequest(views.html.category.edit(id, formWithErrors, vv)))
       },
       (data: CategoryFormData) => {
+
+        CategoryRepository.get(Category.Id(id)).map{
+          case None    => NotFound(views.html.page404(error_vv))
+          case Some(_) => Redirect(routes.CategoryController.list)
+        }
         CategoryRepository.update(
           Category(
             id    = Some(Category.Id(id)),
