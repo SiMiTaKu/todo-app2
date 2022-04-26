@@ -13,6 +13,7 @@ import play.api.i18n.I18nSupport
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.concurrent.Future.successful
 
 
 @Singleton
@@ -95,21 +96,23 @@ class CategoryController @Inject()(
         Future.successful(BadRequest(views.html.category.edit(id, formWithErrors, vv)))
       },
       (data: CategoryFormData) => {
-
-        CategoryRepository.get(Category.Id(id)).map{
-          case None    => NotFound(views.html.page404(error_vv))
-          case Some(_) => Redirect(routes.CategoryController.list)
-        }
-        CategoryRepository.update(
-          Category(
-            id    = Some(Category.Id(id)),
-            name  = data.title,
-            slug  = data.slug,
-            color = Category.ColorMap(data.color.toShort),
-          ).toEmbeddedId
-        ).map {
-          case None => NotFound(views.html.page404(error_vv))
-          case _ => Redirect(routes.CategoryController.list)
+        for {
+          result <- CategoryRepository.get(Category.Id(id)).flatMap {
+            case None      => successful(None)
+            case Some(old) => CategoryRepository.update(
+                                Category(
+                                  id    = old.v.id,
+                                  name  = data.title,
+                                  slug  = data.slug,
+                                  color = Category.ColorMap(data.color.toShort),
+                                ).toEmbeddedId
+                              )
+          }
+        } yield {
+          result match {
+            case None => NotFound(views.html.page404(error_vv))
+            case _    => Redirect(routes.CategoryController.list)
+          }
         }
       }
     )

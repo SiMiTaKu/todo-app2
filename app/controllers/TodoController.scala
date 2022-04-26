@@ -1,16 +1,18 @@
 package controllers
 
-import lib.model.{Todo,Category}
+import lib.model.{Category, Todo}
 import lib.formData.{TodoEditFormData, TodoFormData}
 import lib.formData.formData.{editForm, form}
+
 import javax.inject._
 import play.api.mvc._
-import model.{ViewValueList,ViewValueRegister,ViewValueDetail,ViewValueEdit, ViewValueError}
-import lib.persistence.default.{TodoRepository,CategoryRepository}
-
+import model.{ViewValueDetail, ViewValueEdit, ViewValueError, ViewValueList, ViewValueRegister}
+import lib.persistence.default.{CategoryRepository, TodoRepository}
 import play.api.data.Form
 import play.api.i18n.I18nSupport
+
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future.successful
 
 @Singleton
 class TodoController @Inject()(
@@ -141,22 +143,26 @@ class TodoController @Inject()(
         }
       },
     (data: TodoEditFormData) => {
-      TodoRepository.get(Todo.Id(id)).map {
-        case None    => NotFound(views.html.page404(error_vv))
-        case Some(_) => Redirect(routes.TodoController.list())
+      for {
+        result <- TodoRepository.get(Todo.Id(id)).flatMap {
+          case None      => successful(None)
+          case Some(old) => TodoRepository.update(
+            Todo(
+              id          = old.v.id,
+              category_id = Category.Id(data.category.toLong),
+              title       = data.title,
+              body        = data.body,
+              state       = lib.model.Todo.Status(data.state.toShort)
+            ).toEmbeddedId
+          )
+        }
+      } yield {
+        result match {
+          case None => NotFound(views.html.page404(error_vv))
+          case _    => Redirect(routes.TodoController.list())
+        }
       }
-      TodoRepository.update(
-        Todo(
-          id = Some(Todo.Id(id)),
-          category_id = Category.Id(data.category.toLong),
-          title = data.title,
-          body = data.body,
-          state = lib.model.Todo.Status(data.state.toShort)
-        ).toEmbeddedId
-      ).map{
-        case None => NotFound(views.html.page404(error_vv))
-        case _    => Redirect(routes.TodoController.list)
-      }
+
     })
   }
 }
