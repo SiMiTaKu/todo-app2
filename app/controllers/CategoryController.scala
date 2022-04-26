@@ -96,23 +96,19 @@ class CategoryController @Inject()(
         Future.successful(BadRequest(views.html.category.edit(id, formWithErrors, vv)))
       },
       (data: CategoryFormData) => {
-        for {
-          result <- CategoryRepository.get(Category.Id(id)).flatMap {
-            case None      => successful(None)
-            case Some(old) => CategoryRepository.update(
-                                Category(
-                                  id    = old.v.id,
-                                  name  = data.title,
-                                  slug  = data.slug,
-                                  color = Category.ColorMap(data.color.toShort),
-                                ).toEmbeddedId
-                              )
-          }
-        } yield {
-          result match {
-            case None => NotFound(views.html.page404(error_vv))
-            case _    => Redirect(routes.CategoryController.list)
-          }
+        CategoryRepository.get(Category.Id(id)).flatMap {
+          case None      => successful(None)
+          case Some(old) => CategoryRepository.update(
+                            Category(
+                              id    = old.v.id,
+                              name  = data.title,
+                              slug  = data.slug,
+                              color = Category.ColorMap(data.color.toShort),
+                            ).toEmbeddedId
+                          )
+        }.map {
+          case None => NotFound(views.html.page404(error_vv))
+          case _    => Redirect(routes.CategoryController.list)
         }
       }
     )
