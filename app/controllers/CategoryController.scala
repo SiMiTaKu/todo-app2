@@ -96,37 +96,45 @@ class CategoryController @Inject()(
         Future.successful(BadRequest(views.html.category.edit(id, formWithErrors, vv)))
       },
       (data: CategoryFormData) => {
-        CategoryRepository.get(Category.Id(id)).flatMap {
-          case None      => successful(None)
-          case Some(old) => CategoryRepository.update(
-                            Category(
-                              id    = old.v.id,
-                              name  = data.title,
-                              slug  = data.slug,
-                              color = Category.ColorMap(data.color.toShort),
-                            ).toEmbeddedId
-                          )
-        }.map {
-          case None => NotFound(views.html.page404(error_vv))
-          case _    => Redirect(routes.CategoryController.list)
+        for{
+          result <- CategoryRepository.get(Category.Id(id)).flatMap {
+            case None      => successful(None)
+            case Some(old) => CategoryRepository.update(
+                                Category(
+                                  id    = old.v.id,
+                                  name  = data.title,
+                                  slug  = data.slug,
+                                  color = Category.ColorMap(data.color.toShort),
+                                ).toEmbeddedId
+                              )
+          }
+        } yield {
+          result match {
+            case None => NotFound(views.html.page404(error_vv))
+            case _    => Redirect(routes.CategoryController.list)
+          }
         }
       }
     )
   }
 
-
-
   def remove(id: Long) = Action async { implicit request: Request[AnyContent] =>
-    TodoRepository.getAll().map{
-      case Nil     => NotFound(views.html.page404(error_vv))
-      case todos   => for(todo <- todos.filter(todo => todo.v.category_id.toLong == id)){
-                        todo.v.id.map(todoId => TodoRepository.remove(todoId))
-                      }
+    for{
+      result <- CategoryRepository.remove(Category.Id(id)).flatMap {
+        case None => successful(None)
+        case _    => TodoRepository.getAll().map {
+                       case Nil   =>
+                       case todos => todos.filter(todo => todo.v.category_id.toLong == id).map{
+                         todo =>todo.v.id.map(todoId => TodoRepository.remove(todoId))
+                       }
+                     }
+      }
+    } yield {
+      result match {
+        case None => NotFound(views.html.page404(error_vv))
+        case _    => Redirect(routes.CategoryController.list)
+      }
     }
 
-    CategoryRepository.remove(Category.Id(id)).map{
-      case None                 => NotFound(views.html.page404(error_vv))
-      case Some(categoryRemove) => Redirect(routes.CategoryController.list)
-    }
   }
 }

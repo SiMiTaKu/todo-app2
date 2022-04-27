@@ -143,20 +143,24 @@ class TodoController @Inject()(
         }
       },
     (data: TodoEditFormData) => {
-      TodoRepository.get(Todo.Id(id)).flatMap {
-        case None => successful(None)
-        case Some(old) => TodoRepository.update(
-                            Todo(
-                              id = old.v.id,
-                              category_id = Category.Id(data.category.toLong),
-                              title = data.title,
-                              body = data.body,
-                              state = lib.model.Todo.Status(data.state.toShort)
-                            ).toEmbeddedId
-                          )
-      }.map{
-        case None => NotFound(views.html.page404(error_vv))
-        case _    => Redirect(routes.TodoController.list)
+      for{
+        result <- TodoRepository.get(Todo.Id(id)).flatMap {
+          case None      => successful(None)
+          case Some(old) => TodoRepository.update(
+                              Todo(
+                                id = old.v.id,
+                                category_id = Category.Id(data.category.toLong),
+                                title = data.title,
+                                body = data.body,
+                                state = lib.model.Todo.Status(data.state.toShort)
+                              ).toEmbeddedId
+                            )
+        }
+      } yield {
+        result match {
+          case None => NotFound(views.html.page404(error_vv))
+          case _    => Redirect(routes.TodoController.list)
+        }
       }
     })
   }
