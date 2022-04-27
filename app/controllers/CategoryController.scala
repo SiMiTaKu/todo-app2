@@ -122,7 +122,10 @@ class CategoryController @Inject()(
     for{
       result <- CategoryRepository.remove(Category.Id(id)).flatMap {
         case None => successful(None)
-        case _    => TodoRepository.removeMatchCategory(Category.Id(id))
+        case _    => TodoRepository.getAll().map {
+                       case Nil   =>
+                       case todos => TodoRepository.removeMatchCategory(Category.Id(id))
+                     }
       }
     } yield {
       result match {
