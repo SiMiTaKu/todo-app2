@@ -124,9 +124,11 @@ class CategoryController @Inject()(
         case None => successful(None)
         case _    => TodoRepository.getAll().map {
                        case Nil   =>
-                       case todos => TodoRepository.removeMatchCategory(Category.Id(id))
+                       case todos => todos.filter(todo => todo.v.category_id.toLong == id).map{
+                         todo =>todo.v.id.map(todoId => TodoRepository.remove(todoId))
                        }
                      }
+      }
     } yield {
       result match {
         case None => NotFound(views.html.page404(error_vv))
