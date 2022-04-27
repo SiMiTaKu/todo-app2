@@ -2,7 +2,7 @@ package lib.persistence
 
 import scala.concurrent.Future
 import ixias.persistence.SlickRepository
-import lib.model.Todo
+import lib.model.{Category, Todo}
 import slick.jdbc.JdbcProfile
 
 case class TodoRepository[P <: JdbcProfile]()(implicit val driver: P)
@@ -42,6 +42,18 @@ case class TodoRepository[P <: JdbcProfile]()(implicit val driver: P)
   def remove(id: Id): Future[Option[EntityEmbeddedId]] =
     RunDBAction(TodoTable) { slick =>
       val row = slick.filter(_.id === id)
+      for {
+        old <- row.result.headOption
+        _   <- old match {
+          case None    => DBIO.successful(0)
+          case Some(_) => row.delete
+        }
+      } yield old
+    }
+
+  def removeMatchCategory(id : Category.Id): Future[Option[EntityEmbeddedId]] =
+    RunDBAction(TodoTable) { slick =>
+      val row = slick.filter(_.category_id === id)
       for {
         old <- row.result.headOption
         _   <- old match {
