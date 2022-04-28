@@ -97,17 +97,17 @@ class CategoryController @Inject()(
       },
       (data: CategoryFormData) => {
         for{
-          result <- CategoryRepository.get(Category.Id(id)).flatMap {
-            case None      => successful(None)
-            case Some(old) => CategoryRepository.update(
-                                Category(
-                                  id    = old.v.id,
-                                  name  = data.title,
-                                  slug  = data.slug,
-                                  color = Category.ColorMap(data.color.toShort),
-                                ).toEmbeddedId
-                              )
-          }
+          result <- CategoryRepository.get(Category.Id(id))
+          _      <- result match {
+                      case None      => successful(None)
+                      case Some(old) => CategoryRepository.update(
+                                          old.map(_.copy(
+                                            name  = data.title,
+                                            slug  = data.slug,
+                                            color = Category.ColorMap(data.color.toShort),
+                                          ))
+                                        )
+                      }
         } yield {
           result match {
             case None => NotFound(views.html.page404(error_vv))
@@ -120,12 +120,10 @@ class CategoryController @Inject()(
 
   def remove(id: Long) = Action async { implicit request: Request[AnyContent] =>
     for{
-      result <- CategoryRepository.remove(Category.Id(id)).flatMap {
-        case None => successful(None)
-        case _    => TodoRepository.getAll().map {
-                       case Nil   =>
-                       case todos => TodoRepository.removeMatchCategory(Category.Id(id))
-                     }
+      result <- CategoryRepository.remove(Category.Id(id))
+      _      <- result match {
+                  case None => successful(None)
+                  case _    => TodoRepository.removeMatchCategory(Category.Id(id))
       }
     } yield {
       result match {

@@ -31,12 +31,13 @@ class TodoController @Inject()(
       cssSrc = Seq("main.css"),
       jsSrc  = Seq("main.js")
     )
-    val todos = TodoRepository.getAll()
+    val todos      = TodoRepository.getAll()
+    val categories = CategoryRepository.getAll()
     for{
-      todoList   <- todos
-      categories <- CategoryRepository.getAll()
+      todoList     <- todos
+      categoryList <- categories
     } yield{
-      Ok(views.html.todo.list(todoList, categories, vv))
+      Ok(views.html.todo.list(todoList, categoryList, vv))
     }
   }
 
@@ -46,14 +47,15 @@ class TodoController @Inject()(
       cssSrc = Seq("main.css"),
       jsSrc  = Seq("main.js")
     )
-    val todoGet = TodoRepository.get(Todo.Id(id))
+    val todoGet    = TodoRepository.get(Todo.Id(id))
+    val categories = CategoryRepository.getAll()
 
     for{
-      todo       <- todoGet
-      categories <- CategoryRepository.getAll()
+      todo         <- todoGet
+      categoryList <- categories
     } yield {
       todo match {
-        case Some(result) => Ok(views.html.todo.detail(result, categories, vv))
+        case Some(result) => Ok(views.html.todo.detail(result, categoryList, vv))
         case None         => NotFound(views.html.page404(error_vv))
       }
     }
@@ -104,11 +106,11 @@ class TodoController @Inject()(
       jsSrc  = Seq("main.js")
     )
 
-    val todoGet = TodoRepository.get(Todo.Id(id))
-
+    val todoGet    = TodoRepository.get(Todo.Id(id))
+    val categories = CategoryRepository.getAll()
     for{
-      todo <- todoGet
-      categories <- CategoryRepository.getAll()
+      todo         <- todoGet
+      categoryList <- categories
     } yield {
       todo match {
         case None         => NotFound(views.html.page404(error_vv))
@@ -120,7 +122,7 @@ class TodoController @Inject()(
                                  result.v.body,
                                  result.v.state.toString
                                )),
-                               categories,
+                               categoryList,
                                vv
                              ))
       }
@@ -144,18 +146,18 @@ class TodoController @Inject()(
       },
     (data: TodoEditFormData) => {
       for{
-        result <- TodoRepository.get(Todo.Id(id)).flatMap {
-          case None      => successful(None)
-          case Some(old) => TodoRepository.update(
-                              Todo(
-                                id = old.v.id,
-                                category_id = Category.Id(data.category.toLong),
-                                title = data.title,
-                                body = data.body,
-                                state = lib.model.Todo.Status(data.state.toShort)
-                              ).toEmbeddedId
-                            )
-        }
+        result <- TodoRepository.get(Todo.Id(id))
+        _      <- result match {
+                    case None      => successful(None)
+                    case Some(old) => TodoRepository.update(
+                                        old.map(_.copy(
+                                          category_id = Category.Id(data.category.toLong),
+                                          title       = data.title,
+                                          body        = data.body,
+                                          state       = Todo.Status(data.state.toShort)
+                                        ))
+                                      )
+                  }
       } yield {
         result match {
           case None => NotFound(views.html.page404(error_vv))
