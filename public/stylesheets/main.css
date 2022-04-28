@@ -43,3 +43,88 @@ body {
 .info {
   display: none;
 }
+
+.card{
+  width: 100%;
+  text-align: left;
+  font-size: 13px;
+  background-color: #c7c6c6;
+  padding: 3px;
+  margin-bottom: 6px;
+}
+
+.card__content{
+  background-color: #e1e1e1;
+}
+
+.card__content--body{
+  width: 31%;
+  padding: 5px;
+  display: inline-block;
+  text-align: center;
+  border-left: solid 1px #5d5d5d;
+}
+.card__content--id{
+  width: 10px;
+  padding: 5px;
+  display: inline-block;
+  text-align: center;
+  border-left: solid 1px #5d5d5d;
+}
+.card__content--category{
+  width: 10%;
+  padding: 5px;
+  display: inline-block;
+  text-align: center;
+  border-left: solid 1px #5d5d5d;
+}
+.card__content--title{
+  width: 22%;
+  padding: 5px;
+  display: inline-block;
+  text-align: center;
+  border-left: solid 1px #5d5d5d;
+}
+.card__content--state{
+  width: 7%;
+  padding: 5px;
+  display: inline-block;
+  text-align: center;
+  border-left: solid 1px #5d5d5d;
+  border-right: solid 1px #5d5d5d;
+}
+
+.card__content--name{
+  width: 27%;
+  padding: 5px;
+  display: inline-block;
+  text-align: center;
+  border-left: solid 1px #5d5d5d;
+  border-right: solid 1px #5d5d5d;
+}
+.card__content--slug{
+  width: 27%;
+  padding: 5px;
+  display: inline-block;
+  text-align: center;
+  border-left: solid 1px #5d5d5d;
+}
+.card__content--color{
+  width: 26%;
+  padding: 5px;
+  display: inline-block;
+  text-align: center;
+  border-left: solid 1px #5d5d5d;
+  border-right: solid 1px #5d5d5d;
+}
+
+.card__footer {
+  text-align: right;
+  display: inline-block;
+}
+
+.card__footer .card__footer--item {
+  display:     inline-block;
+  margin-left: 5px;
+}
+

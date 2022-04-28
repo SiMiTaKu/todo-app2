@@ -1,0 +1,62 @@
+
+@import lib.model.Todo
+@import lib.model.Category
+@(todos: Seq[Todo#EmbeddedId], categories: Seq[Category#EmbeddedId], vv: model.ViewValueCommon)(implicit messageProvider: MessagesProvider, requestHeader: RequestHeader)
+@common.Default(vv){
+    <div class = "card">
+        <div class = "card__content">
+            <div class = "card__content--id">ID</div>
+            <div class = "card__content--title">TITLE</div>
+            <div class = "card__content--body">BODY</div>
+            <div class = "card__content--category">CATEGORY</div>
+            <div class = "card__content--state">STATUS</div>
+        </div>
+    </div>
+    @for(todo <- todos) {
+        @defining(categories.filter(category => category.v.id == Some(todo.v.category_id))){ thisCategory =>
+        <div class = "card">
+            <div class = "card__content" style ="background-color: @thisCategory.map(_.v.color)">
+                <div class = "card__content--id">@todo.v.id</div>
+                <div class = "card__content--title">@todo.v.title</div>
+                <div class = "card__content--body">@todo.v.body</div>
+                <div class = "card__content--category">
+                    @thisCategory.map(_.v.name)
+                </div>
+                <div class = "card__content--state">@todo.v.state.name</div>
+
+                <div class = "card__footer">
+                    <div class = "card__footer--item">
+                        @helper.form(action = controllers.routes.TodoController.detail(todo.id)) {
+                            @helper.CSRF.formField
+                            <input type="hidden" value="@todo.id" name="id">
+                            <input type="submit" value="Detail">
+                        }
+                    </div>
+                    <div class = "card__footer--item">
+                        @helper.form(action = controllers.routes.TodoController.edit(todo.id)){
+                            @helper.CSRF.formField
+                            <input type="hidden" value="@todo.id" name="id">
+                            <input type="submit" value="Edit">
+                        }
+                    </div>
+                    <div class = "card__footer--item">
+                        @helper.form(action = controllers.routes.TodoController.remove(todo.id)) {
+                            @helper.CSRF.formField
+                            <input type="hidden" value="@todo.id" name="id">
+                            <input type="submit" value="Remove">
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        }
+    }
+
+    <div>
+        <h2><a href = "/todo/register">Register Form</a></h2>
+    </div>
+    <div>
+        <h2><a href = "/">Back To Home</a></h2>
+    </div>
+
+}

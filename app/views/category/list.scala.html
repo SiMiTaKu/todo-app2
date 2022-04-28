@@ -1,0 +1,44 @@
+@import lib.model.Category
+@(categories: Seq[Category#EmbeddedId], vv: model.ViewValueCommon)(implicit messageProvider: MessagesProvider, requestHeader: RequestHeader)
+@common.Default(vv){
+    <div class = "card">
+        <div class = "card__content">
+            <div class = "card__content--name">Name</div>
+            <div class = "card__content--slug">Slug</div>
+            <div class = "card__content--color">Color</div>
+        </div>
+    </div>
+    @for(category <- categories){
+
+        <div class = "card">
+            <div class = "card__content" style="background-color: @category.v.color">
+                <div class = "card__content--name">@category.v.name</div>
+                <div class = "card__content--slug">@category.v.slug</div>
+                <div class = "card__content--color">@category.v.color</div>
+
+                <div class = "card__footer">
+                    <div class = "card__footer--item">
+                    @helper.form(action = controllers.routes.CategoryController.edit(category.id)){
+                        @helper.CSRF.formField
+                        <input type="hidden" value="@category.id" name="id">
+                        <input type="submit" value="Edit">
+                        }
+                    </div>
+                    <div class = "card__footer--item">
+                    @helper.form(action = controllers.routes.CategoryController.remove(category.id)) {
+                        @helper.CSRF.formField
+                        <input type="hidden" value="@category.id" name="id">
+                        <input type="submit" value="Remove">
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    <h2>
+        <a href="/category/register">Category RegisterForm</a>
+    </h2>
+    <h2>
+        <a href = "/">Back To Home</a>
+    </h2>
+}

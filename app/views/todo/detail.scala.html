@@ -1,0 +1,19 @@
+@import lib.model.Category
+@import lib.model.Todo
+@(todo: Todo#EmbeddedId, categories: Seq[Category#EmbeddedId], vv: model.ViewValueCommon)(implicit messageProvider: MessagesProvider, requestHeader: RequestHeader)
+@common.Default(vv) {
+    @defining(categories.filter(category => category.v.id == Some(todo.v.category_id))) { thisCategory =>
+        <div class = "detail" style = "background-color: @thisCategory.map(_.v.color)">
+
+            <div class = "detail__list">
+                <div class = "detail__list--item">@todo.v.title</div>
+                <div class = "detail__list--item">@todo.v.body</div>
+                <div class = "detail__list--item">@thisCategory.map(_.v.color)</div>
+                <div class = "detail__list--item">@todo.v.state</div>
+            </div>
+        </div>
+        <h2>
+            <a href = "/todo/list">Back To Todo List</a>
+        </h2>
+    }
+}

@@ -1,0 +1,19 @@
+@import lib.model.Category
+@import lib.formData.CategoryFormData
+@(form: Form[CategoryFormData], categories: Seq[Category#EmbeddedId], vv: model.ViewValueCommon)(implicit messageProvider: MessagesProvider, requestHeader: RequestHeader)
+
+@common.Default(vv) {
+    @helper.form(action = controllers.routes.CategoryController.add) {
+        @helper.CSRF.formField
+        @helper.inputText(form("title"))
+        @helper.inputText(form("slug"))
+        @helper.inputRadioGroup(form("color"),
+            options = Category.ColorMap.map1.toSeq.map(color => (color._2.code.toString, color._2.name)),
+            '_help -> ""
+        )
+        <input type="submit" value="Register">
+    }
+    <h2>
+        <a href = "/category/list">Back to todo list</a>
+    </h2>
+}

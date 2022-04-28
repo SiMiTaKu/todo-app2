@@ -26,9 +26,9 @@ case class User(
 //~~~~~~~~~~~~~~~~~~~~~~~~
 object User {
 
-  val  Id = the[Identity[Id]]
-  type Id = Long @@ User
-  type WithNoId = Entity.WithNoId [Id, User]
+  val  Id         = the[Identity[Id]]
+  type Id         = Long @@ User
+  type WithNoId   = Entity.WithNoId [Id, User]
   type EmbeddedId = Entity.EmbeddedId[Id, User]
 
   // ステータス定義
@@ -50,4 +50,5 @@ object User {
       )
     )
   }
+
 }
